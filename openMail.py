@@ -1,4 +1,3 @@
-import schedule
 import time
 import requests
 
@@ -138,17 +137,22 @@ def mailCheck():
     else:
         driver.quit()
         pass
-Timelist = ["00:00","02:00","04:00","06:00","08:00","10:00","12:00","14:00","16:00","18:00","20:00","22:00"]
-T = datetime.now().strftime('%H:%M')
-schedule.every(1).day.at("01:00").do(reset)
+
+Timeline = ["00:00","02:00","04:00","06:00","08:00","10:00","12:00","14:00","16:00","18:00","20:00","22:00"]
+mailTime = datetime.now().strftime('%H:%M')
+resetTime = datetime.now().strftime('%d')
 
 if __name__ == "__main__":
     while True:
-        schedule.run_pending()
-        if any(i in T for i in Timelist):
+        if mailTime in Timeline:
             mailCheck()
             time.sleep(60)
         else:
-            print("alive")
+            time.sleep(1)
+            pass
+        if resetTime == "01":
+            reset()
+            time.sleep(100000)
+        else:
             time.sleep(1)
             pass
