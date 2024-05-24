@@ -139,20 +139,16 @@ def mailCheck():
         pass
 
 Timeline = ["00:00","02:00","04:00","06:00","08:00","10:00","12:00","14:00","16:00","18:00","20:00","22:00"]
-mailTime = datetime.now().strftime('%H:%M')
-resetTime = datetime.now().strftime('%d')
 
-if __name__ == "__main__":
+if __name__ == "__main__":    
     while True:
-        if mailTime in Timeline:
-            mailCheck()
-            time.sleep(60)
-        else:
-            time.sleep(1)
-            pass
-        if resetTime == "01":
-            reset()
-            time.sleep(100000)
-        else:
-            time.sleep(1)
-            pass
+        for i in Timeline:
+            if datetime.now().strftime('%H:%M') == i:
+                mailCheck()
+                time.sleep(60)
+            elif datetime.now().strftime('%d %H:%M') == "01 01:00":
+                reset()
+                time.sleep(60)
+            else:
+                pass
+        time.sleep(1)
