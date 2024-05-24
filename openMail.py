@@ -138,11 +138,17 @@ def mailCheck():
     else:
         driver.quit()
         pass
-
-schedule.every(2).hours.at(":00").do(mailCheck)
+Timelist = ["00:00","02:00","04:00","06:00","08:00","10:00","12:00","14:00","16:00","18:00","20:00","22:00"]
+T = datetime.now().strftime('%H:%M')
 schedule.every(1).day.at("01:00").do(reset)
 
 if __name__ == "__main__":
     while True:
         schedule.run_pending()
-        time.sleep(1)
+        if any(i in T for i in Timelist):
+            mailCheck()
+            time.sleep(60)
+        else:
+            print("alive")
+            time.sleep(1)
+            pass
