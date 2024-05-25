@@ -29,7 +29,7 @@ def reset():
         }
         resets.to_json('C:\\Users\\USER\\ve_1\\RMmailCheck\\RMdata.json',orient='records',force_ascii=False,indent=4)
         #텔레그램 API 전송
-        requests.get(f"https://api.telegram.org/bot{works_login.loc['bot']['token']}/sendMessage?chat_id={works_login.loc['bot']['chatId']}t&text=초기화_완료")
+        requests.get(f"https://api.telegram.org/bot{works_login.loc['bot']['token']}/sendMessage?chat_id={works_login.loc['bot']['chatId']}&text=초기화_완료")
         time.sleep(2)
     else:
         pass
@@ -111,7 +111,7 @@ def mailCheck():
         if newdata.empty:
             #텔레그램 API 전송
             tell = "{일}일 {시간}시 증액 필요 가맹점 없음".format(일=datetime.now().day,시간=datetime.now().hour)
-            requests.get(f"https://api.telegram.org/bot{works_login.loc['bot']['token']}/sendMessage?chat_id={works_login.loc['bot']['chatId']}t&text={tell}")
+            requests.get(f"https://api.telegram.org/bot{works_login.loc['bot']['token']}/sendMessage?chat_id={works_login.loc['bot']['chatId']}&text={tell}")
             driver.quit()
         else:
             for update in newdata.index.tolist():
@@ -123,7 +123,7 @@ def mailCheck():
                                                                                         한도=comma(int(newdata.loc[update]["월한도"])),
                                                                                         증액=comma(int(newdata.loc[update]["월한도"])*120/100))
                 #텔레그램 API 전송
-                requests.get(f"https://api.telegram.org/bot{works_login.loc['bot']['token']}/sendMessage?chat_id={works_login.loc['bot']['chatId']}t&text={tell}")
+                requests.get(f"https://api.telegram.org/bot{works_login.loc['bot']['token']}/sendMessage?chat_id={works_login.loc['bot']['chatId']}&text={tell}")
                 time.sleep(1)
                 #Json파일 업로드
                 if update == newdata.index.tolist()[-1]:
