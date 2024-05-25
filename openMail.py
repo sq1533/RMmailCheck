@@ -12,7 +12,7 @@ import pandas as pd
 from datetime import datetime
 
 #로그인 정보 호출
-works_login = pd.read_json('C:\\Users\\USER\\ve_1\\proj_web\\db\\login.json',
+works_login = pd.read_json('C:\\Users\\USER\\ve_1\\alarmCapture\\db\\login.json',
                            orient='index')
 
 #숫자 콤마넣기
@@ -27,7 +27,7 @@ def reset():
             "월한도":"1000000",
             "비고":"",
         }
-        resets.to_json('C:\\Users\\USER\\ve_1\\RMmailCheck\\RMdata.json',orient='records',force_ascii=False,indent=4)
+        resets.to_json('C:\\Users\\USER\\ve_1\\mailCheck\\RMdata.json',orient='records',force_ascii=False,indent=4)
         #텔레그램 API 전송
         requests.get(f"https://api.telegram.org/bot{works_login.loc['bot']['token']}/sendMessage?chat_id={works_login.loc['bot']['chatId']}t&text=초기화_완료")
         time.sleep(2)
@@ -39,9 +39,7 @@ def mailCheck():
     ignoreName = ["이지피쥐","핀테크링크​","엘피엔지​","코리아결제시스템"]
     ignoreOrder = ["오프라인"]
     #크롬 드라이버 옵션 설정
-    chrome_options = webdriver.ChromeOptions()
-    chrome_options.add_argument('--blink-settings=imagesEnabled=false')
-    driver = webdriver.Chrome(options=chrome_options)
+    driver = webdriver.Chrome(options=webdriver.ChromeOptions().add_argument('--blink-settings=imagesEnabled=false'))
     #크롬 드라이버 실행
     url = "https://auth.worksmobile.com/login/login?accessUrl=https%3A%2F%2Fmail.worksmobile.com%2F"
     driver.get(url)
@@ -96,7 +94,7 @@ def mailCheck():
                 break
         newdata = pd.DataFrame(data={"상점ID":marketID,"상점명":marketName,"월한도":marketPrice,"비고":order})
         #불필요 및 중복 데이터 분류
-        RM_month = pd.read_json('C:\\Users\\USER\\ve_1\\RMmailCheck\\RMdata.json',
+        RM_month = pd.read_json('C:\\Users\\USER\\ve_1\\mailCheck\\RMdata.json',
             orient='records',
             dtype={'상점ID':str,'상점명':str,'월한도':str,'비고':str})
         lastID = RM_month['상점ID'].tolist()
@@ -130,7 +128,7 @@ def mailCheck():
                 #Json파일 업로드
                 if update == newdata.index.tolist()[-1]:
                     resurts = pd.concat([RM_month,newdata],ignore_index=True)
-                    resurts.to_json('C:\\Users\\USER\\ve_1\\RMmailCheck\\RMdata.json',orient='records',force_ascii=False,indent=4)
+                    resurts.to_json('C:\\Users\\USER\\ve_1\\mailCheck\\RMdata.json',orient='records',force_ascii=False,indent=4)
                     driver.quit()
                 else:
                     pass
