@@ -45,15 +45,16 @@ def mailCheck():
     driver.get(url)
     driver.implicitly_wait(1)
     #로그인 정보입력(아이디)
-    id_box = driver.find_element(By.CSS_SELECTOR,'#login_param')
-    login_button_1 = driver.find_element(By.CSS_SELECTOR,'#loginStart')
-    id = works_login.loc['works']['id']
+    id_box = driver.find_element(By.XPATH,'//input[@id="user_id"]')
+    login_button_1 = driver.find_element(By.XPATH,'//button[@id="loginStart"]')
+    ActionChains(driver)
+    id = works_login['works']['id']
     ActionChains(driver).send_keys_to_element(id_box, '{}'.format(id)).click(login_button_1).perform()
-    time.sleep(0.5)
+    time.sleep(1)
     #로그인 정보입력(비밀번호)
-    password_box = driver.find_element(By.CSS_SELECTOR,'#password')
-    login_button_2 = driver.find_element(By.CSS_SELECTOR,'#loginBtn')
-    password = works_login.loc['works']['pw']
+    password_box = driver.find_element(By.XPATH,'//input[@id="user_pwd"]')
+    login_button_2 = driver.find_element(By.XPATH,'//button[@id="loginBtn"]')
+    password = works_login['works']['pw']
     ActionChains(driver).send_keys_to_element(password_box, '{}'.format(password)).click(login_button_2).perform()
     time.sleep(5)
     driver.refresh()
