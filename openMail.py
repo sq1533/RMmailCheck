@@ -12,8 +12,7 @@ import pandas as pd
 from datetime import datetime
 
 #로그인 정보 호출
-works_login = pd.read_json('C:\\Users\\USER\\ve_1\\alarmCapture\\db\\login.json',
-                           orient='index')
+works_login = pd.read_json('C:\\Users\\USER\\ve_1\\alarmCapture\\db\\login.json',orient='records')
 
 #숫자 콤마넣기
 def comma(x):
@@ -29,7 +28,7 @@ def reset():
         }
         resets.to_json('C:\\Users\\USER\\ve_1\\RMmailCheck\\RMdata.json',orient='records',force_ascii=False,indent=4)
         #텔레그램 API 전송
-        requests.get(f"https://api.telegram.org/bot{works_login.loc['bot']['token']}/sendMessage?chat_id={works_login.loc['bot']['chatId']}&text=초기화_완료")
+        requests.get(f"https://api.telegram.org/bot{works_login['bot']['token']}/sendMessage?chat_id={works_login['bot']['chatId']}&text=초기화_완료")
         time.sleep(2)
     else:
         pass
@@ -48,13 +47,13 @@ def mailCheck():
     id_box = driver.find_element(By.XPATH,'//input[@id="user_id"]')
     login_button_1 = driver.find_element(By.XPATH,'//button[@id="loginStart"]')
     ActionChains(driver)
-    id = works_login.loc['works']['id']
+    id = works_login['works']['id']
     ActionChains(driver).send_keys_to_element(id_box, '{}'.format(id)).click(login_button_1).perform()
     time.sleep(1)
     #로그인 정보입력(비밀번호)
     password_box = driver.find_element(By.XPATH,'//input[@id="user_pwd"]')
     login_button_2 = driver.find_element(By.XPATH,'//button[@id="loginBtn"]')
-    password = works_login.loc['works']['pw']
+    password = works_login['works']['pw']
     ActionChains(driver).send_keys_to_element(password_box, '{}'.format(password)).click(login_button_2).perform()
     time.sleep(5)
     driver.refresh()
@@ -112,7 +111,7 @@ def mailCheck():
         if newdata.empty:
             #텔레그램 API 전송
             tell = "{일}일 {시간}시 증액 필요 가맹점 없음".format(일=datetime.now().day,시간=datetime.now().hour)
-            requests.get(f"https://api.telegram.org/bot{works_login.loc['bot']['token']}/sendMessage?chat_id={works_login.loc['bot']['chatId']}&text={tell}")
+            requests.get(f"https://api.telegram.org/bot{works_login['bot']['token']}/sendMessage?chat_id={works_login['bot']['chatId']}&text={tell}")
             driver.quit()
         else:
             for update in newdata.index.tolist():
@@ -124,7 +123,7 @@ def mailCheck():
                                                                                         한도=comma(int(newdata.loc[update]["월한도"])),
                                                                                         증액=comma(int(newdata.loc[update]["월한도"])*120/100))
                 #텔레그램 API 전송
-                requests.get(f"https://api.telegram.org/bot{works_login.loc['bot']['token']}/sendMessage?chat_id={works_login.loc['bot']['chatId']}&text={tell}")
+                requests.get(f"https://api.telegram.org/bot{works_login['bot']['token']}/sendMessage?chat_id={works_login['bot']['chatId']}&text={tell}")
                 time.sleep(1)
                 #Json파일 업로드
                 if update == newdata.index.tolist()[-1]:
