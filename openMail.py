@@ -26,7 +26,7 @@ def reset():
             "월한도":"1000000",
             "비고":"",
         }
-        resets.to_json('C:\\Users\\USER\\ve_1\\RMmailCheck\\RMdata.json',orient='records',force_ascii=False,indent=4)
+        pd.DataFrame(resets,index=[0]).to_json('C:\\Users\\USER\\ve_1\\RMmailCheck\\RMdata.json',orient='records',force_ascii=False,indent=4)
         #텔레그램 API 전송
         requests.get(f"https://api.telegram.org/bot{works_login['bot']['token']}/sendMessage?chat_id={works_login['bot']['chatId']}&text=초기화_완료")
         time.sleep(2)
