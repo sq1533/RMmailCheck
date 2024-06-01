@@ -133,20 +133,32 @@ def mailCheck():
                 else:
                     pass
     else:
+        requests.get(f"https://api.telegram.org/bot{works_login['bot']['token']}/sendMessage?chat_id={works_login['bot']['chatId']}&text=이메일 없음")
         driver.quit()
         pass
-
-Timeline = ["00:00","02:00","04:00","06:00","08:00","10:00","12:00","14:00","16:00","18:00","20:00","22:00"]
-
+restday = ["01","02","06","08","09","15","16","22","23","29","30"] #06월 주말 및 공휴일
+Timeline1 = ["00:00","02:00","04:00","06:00","08:00","10:00","12:00","14:00","16:00","18:00","20:00","22:00"]
+Timeline2 = ["00:00","02:00","04:00","06:00","18:00","20:00","22:00"]
 if __name__ == "__main__":    
     while True:
-        for i in Timeline:
-            if datetime.now().strftime('%H:%M') == i:
+        if datetime.now().strftime('%d') in restday:
+            if datetime.now().strftime('%H:%M') in Timeline1:
                 mailCheck()
-                time.sleep(60)
-            elif datetime.now().strftime('%d %H:%M') == "01 01:00":
-                reset()
                 time.sleep(60)
             else:
                 pass
+        else:
+            if datetime.now().strftime('%H:%M') in Timeline2:
+                mailCheck()
+                time.sleep(60)
+            elif datetime.now().strftime('%H:%M') in Timeline1:
+                requests.get(f"https://api.telegram.org/bot{works_login['bot']['token']}/sendMessage?chat_id={works_login['bot']['chatId']}&text=영업시간 미대응")
+                time.sleep(60)
+            else:
+                pass
+        if datetime.now().strftime('%d %H:%M') == "01 01:00":
+            reset()
+            time.sleep(60)
+        else:
+            pass
         time.sleep(1)
