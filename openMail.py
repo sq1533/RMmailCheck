@@ -137,8 +137,9 @@ def mailCheck():
         driver.quit()
         pass
 restday = ["01","02","06","08","09","15","16","22","23","29","30"] #06월 주말 및 공휴일
-Timeline1 = ["00:00","02:00","04:00","06:00","08:00","10:00","12:00","14:00","16:00","18:00","20:00","22:00"]
-Timeline2 = ["00:00","02:00","04:00","06:00","18:00","20:00","22:00"]
+Timeline1 = ["00:00","02:00","04:00","06:00","08:00","10:00","12:00","14:00","16:00","18:00","20:00","22:00"]#주말 및 공휴일 대응
+Timeline2 = ["00:00","02:00","04:00","06:00","18:00","20:00","22:00"]#영업시간 미대응
+Timeline3 = ["08:00","10:00","12:00","14:00","16:00"]#영업시간 외 대응
 if __name__ == "__main__":    
     while True:
         if datetime.now().strftime('%d') in restday:
@@ -151,7 +152,7 @@ if __name__ == "__main__":
             if datetime.now().strftime('%H:%M') in Timeline2:
                 mailCheck()
                 time.sleep(60)
-            elif datetime.now().strftime('%H:%M') in Timeline1:
+            elif datetime.now().strftime('%H:%M') in Timeline3:
                 requests.get(f"https://api.telegram.org/bot{works_login['bot']['token']}/sendMessage?chat_id={works_login['bot']['chatId']}&text=영업시간 미대응")
                 time.sleep(60)
             else:
