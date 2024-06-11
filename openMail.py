@@ -1,5 +1,6 @@
 import time
 import requests
+import json
 
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -136,13 +137,14 @@ def mailCheck():
         requests.get(f"https://api.telegram.org/bot{works_login['bot']['token']}/sendMessage?chat_id={works_login['bot']['chatId']}&text=이메일 없음")
         driver.quit()
         pass
-restday = ["01","02","06","08","09","15","16","22","23","29","30"] #06월 주말 및 공휴일
+with open('C:\\Users\\USER\\ve_1\\RMmailCheck\\restDay.json',"r") as f:
+    restday = json.load(f)
 Timeline1 = ["00:00","02:00","04:00","06:00","08:00","10:00","12:00","14:00","16:00","18:00","20:00","22:00"]#주말 및 공휴일 대응
 Timeline2 = ["00:00","02:00","04:00","06:00","18:00","20:00","22:00"]#영업시간 미대응
 Timeline3 = ["08:00","10:00","12:00","14:00","16:00"]#영업시간 외 대응
 if __name__ == "__main__":    
     while True:
-        if datetime.now().strftime('%d') in restday:
+        if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')]:
             if datetime.now().strftime('%H:%M') in Timeline1:
                 mailCheck()
                 time.sleep(60)
