@@ -41,7 +41,7 @@ def mailCheck():
     #크롬 드라이버 옵션 설정
     driver = webdriver.Chrome(options=webdriver.ChromeOptions().add_argument('--blink-settings=imagesEnabled=false'))
     #크롬 드라이버 실행
-    url = "https://auth.worksmobile.com/login/login?accessUrl=https%3A%2F%2Fmail.worksmobile.com%2F"
+    url = "https://mail.worksmobile.com/#/my/102"
     driver.get(url)
     driver.implicitly_wait(1)
     #로그인 정보입력(아이디)
@@ -56,8 +56,8 @@ def mailCheck():
     login_button_2 = driver.find_element(By.XPATH,'//button[@id="loginBtn"]')
     password = works_login['works']['pw']
     ActionChains(driver).send_keys_to_element(password_box, '{}'.format(password)).click(login_button_2).perform()
-    time.sleep(5)
-    driver.refresh()
+    time.sleep(3)
+    driver.get(url)
     time.sleep(3)
     #타임 스케쥴 진행
     html = driver.page_source
