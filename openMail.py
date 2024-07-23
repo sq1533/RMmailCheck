@@ -39,7 +39,7 @@ def mailCheck():
     #크롬 드라이버 옵션 설정
     driver = webdriver.Chrome(options=webdriver.ChromeOptions().add_argument('--blink-settings=imagesEnabled=false'))
     #크롬 드라이버 실행
-    url = "https://mail.worksmobile.com/#/my/102"
+    url = "https://mail.worksmobile.com/#/my/104"
     driver.get(url)
     driver.implicitly_wait(1)
     #로그인 정보입력(아이디)
