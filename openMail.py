@@ -1,19 +1,17 @@
 import time
 import requests
 import json
-
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
-
 from bs4 import BeautifulSoup
 import pandas as pd
 from datetime import datetime
 
 #로그인 정보 호출
-works_login = pd.read_json('C:\\Users\\USER\\ve_1\\alarmCapture\\db\\login.json',orient='records')
+works_login = pd.read_json('C:\\Users\\USER\\ve_1\\RMmailCheck\\login.json',orient='records')
 
 #숫자 콤마넣기
 def comma(x):
