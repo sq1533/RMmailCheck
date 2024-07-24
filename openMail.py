@@ -54,8 +54,8 @@ def mailCheck():
     login_button_2 = driver.find_element(By.XPATH,'//button[@id="loginBtn"]')
     password = works_login['works']['pw']
     ActionChains(driver).send_keys_to_element(password_box, '{}'.format(password)).click(login_button_2).perform()
-    time.sleep(3)
-    driver.get(url)
+    time.sleep(5)
+    driver.refresh()
     time.sleep(3)
     #타임 스케쥴 진행
     html = driver.page_source
@@ -63,7 +63,7 @@ def mailCheck():
     #신규 메일 확인
     if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
         newMail = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.XPATH,"//li[contains(@class, 'notRead')]//div[@class='mTitle']//div[@class='subject']")))
+            EC.presence_of_element_located((By.XPATH,"//li[contains(@class, 'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")))
         ActionChains(driver).click(newMail).perform()
         time.sleep(1)
         #필요 데이터 가져오기
