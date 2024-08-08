@@ -94,8 +94,9 @@ def mailCheck():
     login_button_2 = driver.find_element(By.XPATH,'//button[@id="loginBtn"]')
     password = works_login.loc[0,'pw']
     ActionChains(driver).send_keys_to_element(password_box, '{}'.format(password)).click(login_button_2).perform()
+    time.sleep(1)
     driver.get(url)
-    time.sleep(5)
+    time.sleep(4)
     mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
     #신규 메일 확인
     if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
@@ -136,8 +137,9 @@ def mailCheck():
         nextPage = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.XPATH,"//*[@id='root']/div/div/div[1]/div[2]/a")))
         ActionChains(driver).click(nextPage).perform()
+        time.sleep(1)
         driver.get(url)
-        time.sleep(5)
+        time.sleep(4)
         mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
         #신규 메일 확인
         if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
