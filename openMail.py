@@ -198,7 +198,7 @@ if __name__ == "__main__":
                 mailCheck()
                 time.sleep(60)
             elif datetime.now().strftime('%H:%M') in Timeline3:
-                requests.get(f"https://api.telegram.org/bot{works_login['bot']['token']}/sendMessage?chat_id={works_login['bot']['chatId']}&text=영업시간 미대응")
+                requests.get(f"https://api.telegram.org/bot{tele_bot.loc[0,'token']}/sendMessage?chat_id={tele_bot.loc[0,'chatId']}&text=영업시간 미대응")
                 time.sleep(60)
             else:
                 pass
