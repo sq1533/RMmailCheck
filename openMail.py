@@ -10,9 +10,9 @@ from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 from datetime import datetime
 #로그인 정보 호출
-with open('C:\\Users\\USER\\ve_1\\RMmailCheck\\login.json', 'r', encoding='utf-8') as f:
+with open('C:\\Users\\USER\\ve_1\\DB\\3loginInfo.json', 'r', encoding='utf-8') as f:
     login_info = json.load(f)
-works_login = pd.json_normalize(login_info['works'])
+works_login = pd.json_normalize(login_info['worksMail'])
 tele_bot = pd.json_normalize(login_info['bot'])
 #숫자 콤마넣기
 def comma(x):
@@ -26,7 +26,7 @@ def reset():
             "월한도":"1000000",
             "비고":"",
         }
-        pd.DataFrame(resets,index=[0]).to_json('C:\\Users\\USER\\ve_1\\RMmailCheck\\RMdata.json',orient='records',force_ascii=False,indent=4)
+        pd.DataFrame(resets,index=[0]).to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
         #텔레그램 API 전송
         requests.get(f"https://api.telegram.org/bot{tele_bot.loc[0,'token']}/sendMessage?chat_id={tele_bot.loc[0,'chatId']}&text=초기화_완료")
         time.sleep(2)
@@ -61,9 +61,7 @@ def read_mail(soup):
             break
     newdata = pd.DataFrame(data={"상점ID":marketID,"상점명":marketName,"월한도":marketPrice,"비고":order})
     #불필요 및 중복 데이터 분류
-    RM_month = pd.read_json('C:\\Users\\USER\\ve_1\\RMmailCheck\\RMdata.json',
-                            orient='records',
-                            dtype={'상점ID':str,'상점명':str,'월한도':str,'비고':str})
+    RM_month = pd.read_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',dtype={'상점ID':str,'상점명':str,'월한도':str,'비고':str})
     lastID = RM_month['상점ID'].tolist()
     for n in newdata.index.tolist():
         if any(nm in str(newdata.loc[n]["상점명"]) for nm in ignoreName):
@@ -126,10 +124,10 @@ def mailCheck():
                 time.sleep(1)
                 #Json파일 업로드
                 #불필요 및 중복 데이터 분류
-                RM_month = pd.read_json('C:\\Users\\USER\\ve_1\\RMmailCheck\\RMdata.json',orient='records',dtype={'상점ID':str,'상점명':str,'월한도':str,'비고':str})
+                RM_month = pd.read_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',dtype={'상점ID':str,'상점명':str,'월한도':str,'비고':str})
                 if update == read_mail(mail_soup).index.tolist()[-1]:
                     resurts = pd.concat([RM_month,read_mail(mail_soup)],ignore_index=True)
-                    resurts.to_json('C:\\Users\\USER\\ve_1\\RMmailCheck\\RMdata.json',orient='records',force_ascii=False,indent=4)
+                    resurts.to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
                     driver.quit()
                 else:
                     pass
@@ -169,10 +167,10 @@ def mailCheck():
                     time.sleep(1)
                     #Json파일 업로드
                     #불필요 및 중복 데이터 분류
-                    RM_month = pd.read_json('C:\\Users\\USER\\ve_1\\RMmailCheck\\RMdata.json',orient='records',dtype={'상점ID':str,'상점명':str,'월한도':str,'비고':str})
+                    RM_month = pd.read_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',dtype={'상점ID':str,'상점명':str,'월한도':str,'비고':str})
                     if update == read_mail(mail_soup).index.tolist()[-1]:
                         resurts = pd.concat([RM_month,read_mail(mail_soup)],ignore_index=True)
-                        resurts.to_json('C:\\Users\\USER\\ve_1\\RMmailCheck\\RMdata.json',orient='records',force_ascii=False,indent=4)
+                        resurts.to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
                         driver.quit()
                     else:
                         pass
@@ -180,7 +178,7 @@ def mailCheck():
         requests.get(f"https://api.telegram.org/bot{tele_bot.loc[0,'token']}/sendMessage?chat_id={tele_bot.loc[0,'chatId']}&text=이메일 없음")
         driver.quit()
         pass
-with open('C:\\Users\\USER\\ve_1\\RMmailCheck\\restDay.json',"r") as f:
+with open('C:\\Users\\USER\\ve_1\\DB\\8restDay.json',"r") as f:
     restday = json.load(f)
 Timeline1 = ["00:00","02:00","04:00","06:00","08:00","10:00","12:00","14:00","16:00","18:00","20:00","22:00"]#주말 및 공휴일 대응
 Timeline2 = ["00:00","02:00","04:00","06:00","18:00","20:00","22:00"]#영업시간 미대응
