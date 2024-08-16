@@ -13,9 +13,14 @@ with open('C:\\Users\\USER\\ve_1\\DB\\3loginInfo.json', 'r', encoding='utf-8') a
 works_login = pd.Series(login_info['worksMail'])
 tele_bot = pd.Series(login_info['bot'])
 #크롬 드라이버 옵션 설정 및 실행
-driver = webdriver.Chrome(options=webdriver.ChromeOptions().add_argument('--blink-settings=imagesEnabled=false'))
-url = "https://mail.worksmobile.com/#/my/102"
-driver.get(url)
+#크롬 옵션설정
+options = webdriver.ChromeOptions()
+options.add_argument('--disable-gpu')
+options.add_argument('--disable-extensions')
+options.add_argument('--blink-settings=imagesEnabled=false')
+driver = webdriver.Chrome(options=options)
+#크롬 드라이버 실행
+driver.get("https://mail.worksmobile.com/#/my/102")
 driver.implicitly_wait(1)
 #로그인 정보입력(아이디)
 id_box = driver.find_element(By.XPATH,'//input[@id="user_id"]')
@@ -31,7 +36,7 @@ ActionChains(driver).send_keys_to_element(password_box, '{}'.format(password)).c
 time.sleep(2)
 #임시한도 증액 메일 텍스트 데이터 읽어오기
 def mailCheck():
-    driver.get(url)
+    driver.refresh()
     time.sleep(2)
     mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
     if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
@@ -68,7 +73,7 @@ def mailCheck():
         pass
 #영업시간 이메일 클릭
 def emailClick():
-    driver.get(url)
+    driver.refresh()
     time.sleep(2)
     mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
     if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
