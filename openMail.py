@@ -21,7 +21,7 @@ options.add_argument('--blink-settings=imagesEnabled=false')
 driver = webdriver.Chrome(options=options)
 #크롬 드라이버 실행
 driver.get("https://mail.worksmobile.com/#/my/102")
-driver.implicitly_wait(1)
+time.sleep(1)
 #로그인 정보입력(아이디)
 id_box = driver.find_element(By.XPATH,'//input[@id="user_id"]')
 login_button_1 = driver.find_element(By.XPATH,'//button[@id="loginStart"]')
@@ -50,6 +50,7 @@ def mailCheck():
             #텔레그램 API 전송
             tell = "{일}일 {시간}시 증액 필요 가맹점 없음".format(일=datetime.now().day,시간=datetime.now().hour)
             requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text={tell}")
+            driver.get("https://mail.worksmobile.com/#/my/102")
         else:
             for update in read_mail(mail_soup).index.tolist():
                 tell = '{일}일 {시간}시 {상점명}[{상점ID}] 한도 증액필요\n월한도 {한도}원 / 증액 {증액}원'.format(
@@ -69,6 +70,7 @@ def mailCheck():
                     resurts.to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
                 else:
                     pass
+            driver.get("https://mail.worksmobile.com/#/my/102")
     else:
         pass
 #영업시간 이메일 클릭
@@ -79,6 +81,8 @@ def emailClick():
     if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
         newMail = driver.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
         ActionChains(driver).click(newMail).perform()
+        time.sleep(1)
+        driver.get("https://mail.worksmobile.com/#/my/102")
     else:
         pass
 #숫자 콤마넣기
@@ -146,14 +150,14 @@ if __name__ == "__main__":
     while True:
         if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')]:
             mailCheck()
-            time.sleep(5)
+            time.sleep(10)
         else:
             if "08:00" <= datetime.now().strftime('%H:%M') < "18:00":
                 emailClick()
-                time.sleep(5)
+                time.sleep(10)
             else:
                 mailCheck()
-                time.sleep(5)
+                time.sleep(10)
         if datetime.now().strftime('%d %H:%M') == "01 01:00":
             reset()
         else:
