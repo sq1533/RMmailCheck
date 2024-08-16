@@ -31,69 +31,51 @@ ActionChains(driver).send_keys_to_element(password_box, '{}'.format(password)).c
 time.sleep(2)
 #임시한도 증액 메일 텍스트 데이터 읽어오기
 def mailCheck():
-    c:int = 0
-    for c in range(5):
-        driver.get(url)
-        time.sleep(2)
-        mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
-        if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
-            newMail = driver.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
-            ActionChains(driver).click(newMail).perform()
-            time.sleep(1)
-            #필요 데이터 가져오기
-            mail_soup = BeautifulSoup(driver.page_source,'html.parser')
-            #증액 필요 가맹점 파일 업데이트 및 텔레그램 전송
-            if read_mail(mail_soup).empty:
-                #텔레그램 API 전송
-                tell = "{일}일 {시간}시 증액 필요 가맹점 없음".format(일=datetime.now().day,시간=datetime.now().hour)
-                requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text={tell}")
-                time.sleep(60)
-                break
-            else:
-                for update in read_mail(mail_soup).index.tolist():
-                    tell = '{일}일 {시간}시 {상점명}[{상점ID}] 한도 증액필요\n월한도 {한도}원 / 증액 {증액}원'.format(
-                                                                                            일=datetime.now().day,
-                                                                                            시간=datetime.now().hour,
-                                                                                            상점명=read_mail(mail_soup).loc[update]["상점명"],
-                                                                                            상점ID=read_mail(mail_soup).loc[update]["상점ID"],
-                                                                                            한도=comma(int(read_mail(mail_soup).loc[update]["월한도"])),
-                                                                                            증액=comma(int(read_mail(mail_soup).loc[update]["월한도"])*120/100))
-                    #텔레그램 API 전송
-                    requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text={tell}")
-                    time.sleep(1)
-                    #Json파일 업로드
-                    #불필요 및 중복 데이터 분류
-                    RM_month = pd.read_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',dtype={'상점ID':str,'상점명':str,'월한도':str,'비고':str})
-                    if update == read_mail(mail_soup).index.tolist()[-1]:
-                        resurts = pd.concat([RM_month,read_mail(mail_soup)],ignore_index=True)
-                        resurts.to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)        
-                    else:
-                        pass
-                time.sleep(60)
-                break
+    driver.get(url)
+    time.sleep(2)
+    mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
+    if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
+        newMail = driver.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
+        ActionChains(driver).click(newMail).perform()
+        time.sleep(1)
+        #필요 데이터 가져오기
+        mail_soup = BeautifulSoup(driver.page_source,'html.parser')
+        #증액 필요 가맹점 파일 업데이트 및 텔레그램 전송
+        if read_mail(mail_soup).empty:
+            #텔레그램 API 전송
+            tell = "{일}일 {시간}시 증액 필요 가맹점 없음".format(일=datetime.now().day,시간=datetime.now().hour)
+            requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text={tell}")
         else:
-            c += 1
-            pass
-        requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text=이메일 없음")
-        time.sleep(60)
-        break
+            for update in read_mail(mail_soup).index.tolist():
+                tell = '{일}일 {시간}시 {상점명}[{상점ID}] 한도 증액필요\n월한도 {한도}원 / 증액 {증액}원'.format(
+                                                                                        일=datetime.now().day,
+                                                                                        시간=datetime.now().hour,
+                                                                                        상점명=read_mail(mail_soup).loc[update]["상점명"],
+                                                                                        상점ID=read_mail(mail_soup).loc[update]["상점ID"],
+                                                                                        한도=comma(int(read_mail(mail_soup).loc[update]["월한도"])),
+                                                                                        증액=comma(int(read_mail(mail_soup).loc[update]["월한도"])*120/100))
+                #텔레그램 API 전송
+                requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text={tell}")
+                time.sleep(1)
+                #Json파일 업로드, 불필요 및 중복 데이터 분류
+                RM_month = pd.read_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',dtype={'상점ID':str,'상점명':str,'월한도':str,'비고':str})
+                if update == read_mail(mail_soup).index.tolist()[-1]:
+                    resurts = pd.concat([RM_month,read_mail(mail_soup)],ignore_index=True)
+                    resurts.to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
+                else:
+                    pass
+    else:
+        pass
 #영업시간 이메일 클릭
 def emailClick():
-    c:int = 0
-    for c in range(5):
-        driver.get(url)
-        time.sleep(2)
-        mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
-        if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
-            newMail = driver.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
-            ActionChains(driver).click(newMail).perform()
-            time.sleep(60)
-            break
-        else:
-            c += 1
-            pass
-        time.sleep(60)
-        break
+    driver.get(url)
+    time.sleep(2)
+    mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
+    if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
+        newMail = driver.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
+        ActionChains(driver).click(newMail).perform()
+    else:
+        pass
 #숫자 콤마넣기
 def comma(x):
     return '{:,}'.format(round(x))
@@ -153,25 +135,20 @@ def read_mail(soup):
         else:
             pass
     return newdata
-with open('C:\\Users\\USER\\ve_1\\DB\\8restDay.json',"r") as f:
-    restday = json.load(f)
-Timeline1 = ["00:00","02:00","04:00","06:00","08:00","10:00","12:00","14:00","16:00","18:00","20:00","22:00"]#주말 및 공휴일 대응
-Timeline2 = ["00:00","02:00","04:00","06:00","18:00","20:00","22:00"]#영업시간 미대응
-Timeline3 = ["08:00","10:00","12:00","14:00","16:00"]#영업시간 외 대응
-if __name__ == "__main__":    
+if __name__ == "__main__":
+    with open('C:\\Users\\USER\\ve_1\\DB\\8restDay.json',"r") as f:
+        restday = json.load(f)
     while True:
         if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')]:
-            if datetime.now().strftime('%H:%M') in Timeline1:
-                mailCheck()
-            else:
-                pass
+            mailCheck()
+            time.sleep(5)
         else:
-            if datetime.now().strftime('%H:%M') in Timeline2:
-                mailCheck()
-            elif datetime.now().strftime('%H:%M') in Timeline3:
+            if "08:00" <= datetime.now().strftime('%H:%M') < "18:00":
                 emailClick()
+                time.sleep(5)
             else:
-                pass
+                mailCheck()
+                time.sleep(5)
         if datetime.now().strftime('%d %H:%M') == "01 01:00":
             reset()
         else:
