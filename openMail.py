@@ -14,7 +14,7 @@ works_login = pd.Series(login_info['worksMail'])
 tele_bot = pd.Series(login_info['bot'])
 #크롬 드라이버 옵션 설정 및 실행
 driver = webdriver.Chrome(options=webdriver.ChromeOptions().add_argument('--blink-settings=imagesEnabled=false'))
-url = "https://mail.worksmobile.com/#/my/104"
+url = "https://mail.worksmobile.com/#/my/102"
 driver.get(url)
 driver.implicitly_wait(1)
 #로그인 정보입력(아이디)
