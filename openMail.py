@@ -47,6 +47,7 @@ def mailCheck():
                 #텔레그램 API 전송
                 tell = "{일}일 {시간}시 증액 필요 가맹점 없음".format(일=datetime.now().day,시간=datetime.now().hour)
                 requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text={tell}")
+                time.sleep(60)
                 break
             else:
                 for update in read_mail(mail_soup).index.tolist():
@@ -68,11 +69,13 @@ def mailCheck():
                         resurts.to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)        
                     else:
                         pass
+                time.sleep(60)
                 break
         else:
             c += 1
             pass
         requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text=이메일 없음")
+        time.sleep(60)
         break
 #영업시간 이메일 클릭
 def emailClick():
@@ -84,10 +87,12 @@ def emailClick():
         if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
             newMail = driver.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
             ActionChains(driver).click(newMail).perform()
+            time.sleep(60)
             break
         else:
             c += 1
             pass
+        time.sleep(60)
         break
 #숫자 콤마넣기
 def comma(x):
@@ -104,7 +109,7 @@ def reset():
         pd.DataFrame(resets,index=[0]).to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
         #텔레그램 API 전송
         requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text=초기화_완료")
-        time.sleep(2)
+        time.sleep(60)
     else:
         pass
 #메일 읽기
@@ -158,21 +163,21 @@ if __name__ == "__main__":
         if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')]:
             if datetime.now().strftime('%H:%M') in Timeline1:
                 mailCheck()
-                time.sleep(60)
+                time.sleep(0.5)
             else:
                 pass
         else:
             if datetime.now().strftime('%H:%M') in Timeline2:
                 mailCheck()
-                time.sleep(60)
+                time.sleep(0.5)
             elif datetime.now().strftime('%H:%M') in Timeline3:
                 emailClick()
-                time.sleep(60)
+                time.sleep(0.5)
             else:
                 pass
         if datetime.now().strftime('%d %H:%M') == "01 01:00":
             reset()
-            time.sleep(60)
+            time.sleep(0.5)
         else:
             pass
         time.sleep(0.5)
