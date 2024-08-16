@@ -163,21 +163,17 @@ if __name__ == "__main__":
         if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')]:
             if datetime.now().strftime('%H:%M') in Timeline1:
                 mailCheck()
-                time.sleep(0.5)
             else:
                 pass
         else:
             if datetime.now().strftime('%H:%M') in Timeline2:
                 mailCheck()
-                time.sleep(0.5)
             elif datetime.now().strftime('%H:%M') in Timeline3:
                 emailClick()
-                time.sleep(0.5)
             else:
                 pass
         if datetime.now().strftime('%d %H:%M') == "01 01:00":
             reset()
-            time.sleep(0.5)
         else:
             pass
         time.sleep(0.5)
