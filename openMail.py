@@ -74,6 +74,21 @@ def mailCheck():
             pass
         requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text=이메일 없음")
         break
+#영업시간 이메일 클릭
+def emailClick():
+    c:int = 0
+    for c in range(5):
+        driver.get(url)
+        time.sleep(2)
+        mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
+        if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
+            newMail = driver.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
+            ActionChains(driver).click(newMail).perform()
+            break
+        else:
+            c += 1
+            pass
+        break
 #숫자 콤마넣기
 def comma(x):
     return '{:,}'.format(round(x))
@@ -151,7 +166,7 @@ if __name__ == "__main__":
                 mailCheck()
                 time.sleep(60)
             elif datetime.now().strftime('%H:%M') in Timeline3:
-                requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text=영업시간 미대응")
+                emailClick()
                 time.sleep(60)
             else:
                 pass
