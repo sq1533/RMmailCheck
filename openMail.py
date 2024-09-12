@@ -160,13 +160,13 @@ if __name__ == "__main__":
         #nfax/RM메일 확인
         if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')] and datetime.now().strftime('%H:%M:%S') in rmTime_all:
             mailCheck()
-            time.sleep(60)
+            time.sleep(5)
         elif datetime.now().strftime('%d') not in restday[datetime.now().strftime('%m')] and datetime.now().strftime('%H:%M:%S') not in rmTime_end:
             mailCheck()
-            time.sleep(60)
+            time.sleep(5)
         elif datetime.now().strftime('%d') not in restday[datetime.now().strftime('%m')] and datetime.now().strftime('%H:%M:%S') in rmTime_work:
             emailClick()
-            time.sleep(60)
+            time.sleep(5)
         else:
             pass
         time.sleep(0.5)
