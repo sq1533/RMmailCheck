@@ -7,20 +7,23 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 from datetime import datetime
-#로그인 정보 호출
+#DB정보 호출
 with open('C:\\Users\\USER\\ve_1\\DB\\3loginInfo.json', 'r', encoding='utf-8') as f:
     login_info = json.load(f)
+with open('C:\\Users\\USER\\ve_1\\DB\\6faxInfo.json', 'r',encoding='utf-8') as f:
+    fax_info = json.load(f)
 works_login = pd.Series(login_info['worksMail'])
 tele_bot = pd.Series(login_info['bot'])
-#크롬 드라이버 옵션 설정 및 실행
+fax = pd.DataFrame(fax_info)
 #크롬 옵션설정
 options = webdriver.ChromeOptions()
 options.add_argument('--disable-gpu')
+options.add_argument("--disable-javascript")
 options.add_argument('--disable-extensions')
 options.add_argument('--blink-settings=imagesEnabled=false')
 driver = webdriver.Chrome(options=options)
 #크롬 드라이버 실행
-driver.get("https://mail.worksmobile.com/#/my/102")
+driver.get("https://mail.worksmobile.com/")
 time.sleep(1)
 #로그인 정보입력(아이디)
 id_box = driver.find_element(By.XPATH,'//input[@id="user_id"]')
@@ -36,6 +39,7 @@ ActionChains(driver).send_keys_to_element(password_box, '{}'.format(password)).c
 time.sleep(2)
 #임시한도 증액 메일 텍스트 데이터 읽어오기
 def mailCheck():
+    driver.get("https://mail.worksmobile.com/#/my/102")
     driver.refresh()
     time.sleep(2)
     mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
@@ -62,7 +66,6 @@ def mailCheck():
                                                                                         증액=comma(int(read_mail(mail_soup).loc[update]["월한도"])*120/100))
                 #텔레그램 API 전송
                 requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text={tell}")
-                time.sleep(1)
                 #Json파일 업로드, 불필요 및 중복 데이터 분류
                 RM_month = pd.read_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',dtype={'상점ID':str,'상점명':str,'월한도':str,'비고':str})
                 if update == read_mail(mail_soup).index.tolist()[-1]:
@@ -70,19 +73,17 @@ def mailCheck():
                     resurts.to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
                 else:
                     pass
-            driver.get("https://mail.worksmobile.com/#/my/102")
     else:
         pass
 #영업시간 이메일 클릭
 def emailClick():
+    driver.get("https://mail.worksmobile.com/#/my/102")
     driver.refresh()
     time.sleep(2)
     mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
     if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
         newMail = driver.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
         ActionChains(driver).click(newMail).perform()
-        time.sleep(1)
-        driver.get("https://mail.worksmobile.com/#/my/102")
     else:
         pass
 #숫자 콤마넣기
@@ -100,7 +101,6 @@ def reset():
         pd.DataFrame(resets,index=[0]).to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
         #텔레그램 API 전송
         requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text=초기화_완료")
-        time.sleep(60)
     else:
         pass
 #메일 읽기
@@ -147,19 +147,26 @@ def read_mail(soup):
 if __name__ == "__main__":
     with open('C:\\Users\\USER\\ve_1\\DB\\8restDay.json',"r") as f:
         restday = json.load(f)
+    rmTime_all = ["00:00","02:00","04:00","06:00","08:00","10:00","12:00","14:00","16:00","18:00","20:00","22:00"]
+    rmTime_end = ["00:00","02:00","04:00","06:00","18:00","20:00","22:00"]
+    rmTime_work = ["08:00","10:00","12:00","14:00","16:00"]
     while True:
-        if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')]:
-            mailCheck()
-            time.sleep(10)
-        else:
-            if "08:00" <= datetime.now().strftime('%H:%M') < "18:00":
-                emailClick()
-                time.sleep(10)
-            else:
-                mailCheck()
-                time.sleep(10)
+        #RM_DB 초기화
         if datetime.now().strftime('%d %H:%M') == "01 01:00":
             reset()
+            time.sleep(60)
+        else:
+            pass
+        #nfax/RM메일 확인
+        if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')] and datetime.now().strftime('%H:%M:%S') in rmTime_all:
+            mailCheck()
+            time.sleep(60)
+        elif datetime.now().strftime('%d') not in restday[datetime.now().strftime('%m')] and datetime.now().strftime('%H:%M:%S') not in rmTime_end:
+            mailCheck()
+            time.sleep(60)
+        elif datetime.now().strftime('%d') not in restday[datetime.now().strftime('%m')] and datetime.now().strftime('%H:%M:%S') in rmTime_work:
+            emailClick()
+            time.sleep(60)
         else:
             pass
         time.sleep(0.5)
