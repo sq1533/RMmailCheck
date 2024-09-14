@@ -56,7 +56,6 @@ def mailCheck():
             #텔레그램 API 전송
             tell = "{일}일 {시간}시 증액 필요 가맹점 없음".format(일=datetime.now().day,시간=datetime.now().hour)
             requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text={tell}")
-            driver.get("https://mail.worksmobile.com/#/my/102")
         else:
             for update in read_mail(mail_soup).index.tolist():
                 tell = '{일}일 {시간}시 {상점명}[{상점ID}] 한도 증액필요\n월한도 {한도}원 / 증액 {증액}원'.format(
@@ -75,7 +74,8 @@ def mailCheck():
                     resurts.to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
                 else:
                     pass
-            driver.get("https://mail.worksmobile.com/#/my/102")
+        driver.get("https://mail.worksmobile.com/#/my/102")
+        time.sleep(50)
     else:
         pass
 #영업시간 이메일 클릭
@@ -87,6 +87,7 @@ def emailClick():
         newMail = driver.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
         ActionChains(driver).click(newMail).perform()
         driver.get("https://mail.worksmobile.com/#/my/102")
+        time.sleep(50)
     else:
         pass
 #숫자 콤마넣기
