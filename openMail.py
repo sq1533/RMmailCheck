@@ -37,10 +37,11 @@ password_box = driver.find_element(By.XPATH,'//input[@id="user_pwd"]')
 login_button_2 = driver.find_element(By.XPATH,'//button[@id="loginBtn"]')
 password = works_login['pw']
 ActionChains(driver).send_keys_to_element(password_box, '{}'.format(password)).click(login_button_2).perform()
-time.sleep(2)
+time.sleep(1)
+driver.get("https://mail.worksmobile.com/#/my/102")
+time.sleep(1)
 #임시한도 증액 메일 텍스트 데이터 읽어오기
 def mailCheck():
-    driver.get("https://mail.worksmobile.com/#/my/102")
     driver.refresh()
     time.sleep(2)
     mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
@@ -74,17 +75,18 @@ def mailCheck():
                     resurts.to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
                 else:
                     pass
+            driver.get("https://mail.worksmobile.com/#/my/102")
     else:
         pass
 #영업시간 이메일 클릭
 def emailClick():
-    driver.get("https://mail.worksmobile.com/#/my/102")
     driver.refresh()
     time.sleep(2)
     mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
     if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
         newMail = driver.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
         ActionChains(driver).click(newMail).perform()
+        driver.get("https://mail.worksmobile.com/#/my/102")
     else:
         pass
 #숫자 콤마넣기
