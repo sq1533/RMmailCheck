@@ -154,7 +154,7 @@ if __name__ == "__main__":
         if datetime.now().strftime('%d %H:%M') == "01 01:00":
             RMmail.reset()
         else:pass
-        for i in range(300):
+        for i in range(100):
             if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')]:
                 RMmail.newMail()
                 t.sleep(5)
