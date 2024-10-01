@@ -68,7 +68,7 @@ def read_mail(soup):
     return newdata
 class RM:
     #매월 1일 데이터 초기화
-    def reset():
+    def reset(self):
         resets = {
             "상점ID":"T_ID",
             "상점명":"T_Name",
@@ -79,7 +79,7 @@ class RM:
         #텔레그램 API 전송
         requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text=초기화_완료")
         t.sleep(61)
-    def getHome():
+    def getHome(self):
         driver.get("https://mail.worksmobile.com/")
         t.sleep(1)
         id_box = driver.find_element(By.XPATH,'//input[@id="user_id"]')
@@ -92,7 +92,7 @@ class RM:
         password = works_login['pw']
         ActionChains(driver).send_keys_to_element(password_box, '{}'.format(password)).click(login_button_2).perform()
         t.sleep(1)
-    def newMail():
+    def newMail(self):
         driver.get("https://mail.worksmobile.com/#/my/102")
         t.sleep(2)
         mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
@@ -123,7 +123,7 @@ class RM:
             t.sleep(60*60)
         else:
             pass
-    def emailClick():
+    def emailClick(self):
         driver.get("https://mail.worksmobile.com/#/my/102")
         t.sleep(2)
         mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
@@ -135,12 +135,12 @@ class RM:
         else:
             pass
     #종료
-    def logout():
+    def logout(self):
         logout_profile = driver.find_element(By.XPATH,'//div[@class="profile_area"]')
         logout_btn = driver.find_element(By.XPATH,'//a[@class="btn logout"]')
         ActionChains(driver).click(logout_profile).click(logout_btn).perform()
         t.sleep(1)
-    def login():
+    def login(self):
         password_box = driver.find_element(By.XPATH,'//input[@id="user_pwd"]')
         login_button_2 = driver.find_element(By.XPATH,'//button[@id="loginBtn"]')
         password = works_login['pw']
