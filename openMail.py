@@ -120,7 +120,7 @@ class RM:
                         resurts.to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
                     else:
                         pass
-            t.sleep(60*60)
+            t.sleep(60*58)
         else:
             pass
     def emailClick(self):
@@ -131,7 +131,7 @@ class RM:
             newMail = driver.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
             ActionChains(driver).click(newMail).perform()
             driver.get("https://mail.worksmobile.com/#/my/102")
-            t.sleep(60*60)
+            t.sleep(60*58)
         else:
             pass
     #종료
