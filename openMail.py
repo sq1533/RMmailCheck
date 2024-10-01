@@ -14,6 +14,15 @@ options.add_argument("--disable-javascript")
 options.add_argument('--disable-extensions')
 options.add_argument('--blink-settings=imagesEnabled=false')
 driver = webdriver.Chrome(options=options)
+with open('C:\\Users\\USER\\ve_1\\DB\\3loginInfo.json', 'r', encoding='utf-8') as f:
+    login_info = json.load(f)
+with open('C:\\Users\\USER\\ve_1\\DB\\6faxInfo.json', 'r',encoding='utf-8') as f:
+    fax_info = json.load(f)
+with open('C:\\Users\\USER\\ve_1\\DB\\8restDay.json',"r") as f:
+    restday = json.load(f)
+tele_bot = pd.Series(login_info['bot'])
+works_login = pd.Series(login_info['worksMail'])
+fax = pd.DataFrame(fax_info)
 #숫자 콤마넣기
 def comma(x):
     return '{:,}'.format(round(x))
@@ -58,16 +67,8 @@ def read_mail(soup):
             pass
     return newdata
 class RM:
-    def __init__(self):
-        with open('C:\\Users\\USER\\ve_1\\DB\\3loginInfo.json', 'r', encoding='utf-8') as f:
-            login_info = json.load(f)
-        with open('C:\\Users\\USER\\ve_1\\DB\\6faxInfo.json', 'r',encoding='utf-8') as f:
-            fax_info = json.load(f)
-        self.tele_bot = pd.Series(login_info['bot'])
-        self.works_login = pd.Series(login_info['worksMail'])
-        self.fax = pd.DataFrame(fax_info)
     #매월 1일 데이터 초기화
-    def reset(self):
+    def reset():
         resets = {
             "상점ID":"T_ID",
             "상점명":"T_Name",
@@ -76,22 +77,22 @@ class RM:
         }
         pd.DataFrame(resets,index=[0]).to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
         #텔레그램 API 전송
-        requests.get(f"https://api.telegram.org/bot{self.tele_bot['token']}/sendMessage?chat_id={self.tele_bot['chatId']}&text=초기화_완료")
+        requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text=초기화_완료")
         t.sleep(61)
-    def getHome(self):
+    def getHome():
         driver.get("https://mail.worksmobile.com/")
         t.sleep(1)
         id_box = driver.find_element(By.XPATH,'//input[@id="user_id"]')
         login_button_1 = driver.find_element(By.XPATH,'//button[@id="loginStart"]')
-        id = self.works_login['id']
+        id = works_login['id']
         ActionChains(driver).send_keys_to_element(id_box, '{}'.format(id)).click(login_button_1).perform()
         t.sleep(1)
         password_box = driver.find_element(By.XPATH,'//input[@id="user_pwd"]')
         login_button_2 = driver.find_element(By.XPATH,'//button[@id="loginBtn"]')
-        password = self.works_login['pw']
+        password = works_login['pw']
         ActionChains(driver).send_keys_to_element(password_box, '{}'.format(password)).click(login_button_2).perform()
         t.sleep(1)
-    def newMail(self):
+    def newMail():
         driver.get("https://mail.worksmobile.com/#/my/102")
         t.sleep(2)
         mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
@@ -102,7 +103,7 @@ class RM:
             mail_soup = BeautifulSoup(driver.page_source,'html.parser')
             if read_mail(mail_soup).empty:
                 tell = "{일}일 {시간}시 증액 필요 가맹점 없음".format(일=datetime.now().day,시간=datetime.now().hour)
-                requests.get(f"https://api.telegram.org/bot{self.tele_bot['token']}/sendMessage?chat_id={self.tele_bot['chatId']}&text={tell}")
+                requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text={tell}")
             else:
                 for update in read_mail(mail_soup).index.tolist():
                     tell = '{일}일 {시간}시 {상점명}[{상점ID}] 한도 증액필요\n월한도 {한도}원 / 증액 {증액}원'.format(
@@ -112,7 +113,7 @@ class RM:
                         상점ID=read_mail(mail_soup).loc[update]["상점ID"],
                         한도=comma(int(read_mail(mail_soup).loc[update]["월한도"])),
                         증액=comma(int(read_mail(mail_soup).loc[update]["월한도"])*120/100))
-                    requests.get(f"https://api.telegram.org/bot{self.tele_bot['token']}/sendMessage?chat_id={self.tele_bot['chatId']}&text={tell}")
+                    requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text={tell}")
                     RM_month = pd.read_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',dtype={'상점ID':str,'상점명':str,'월한도':str,'비고':str})
                     if update == read_mail(mail_soup).index.tolist()[-1]:
                         resurts = pd.concat([RM_month,read_mail(mail_soup)],ignore_index=True)
@@ -122,7 +123,7 @@ class RM:
             t.sleep(60*60)
         else:
             pass
-    def emailClick(self):
+    def emailClick():
         driver.get("https://mail.worksmobile.com/#/my/102")
         t.sleep(2)
         mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
@@ -134,21 +135,19 @@ class RM:
         else:
             pass
     #종료
-    def logout(self):
+    def logout():
         logout_profile = driver.find_element(By.XPATH,'//div[@class="profile_area"]')
         logout_btn = driver.find_element(By.XPATH,'//a[@class="btn logout"]')
         ActionChains(driver).click(logout_profile).click(logout_btn).perform()
         t.sleep(1)
-    def login(self):
+    def login():
         password_box = driver.find_element(By.XPATH,'//input[@id="user_pwd"]')
         login_button_2 = driver.find_element(By.XPATH,'//button[@id="loginBtn"]')
-        password = self.works_login['pw']
+        password = works_login['pw']
         ActionChains(driver).send_keys_to_element(password_box, '{}'.format(password)).click(login_button_2).perform()
         t.sleep(1)
 RMmail = RM()
 if __name__ == "__main__":
-    with open('C:\\Users\\USER\\ve_1\\DB\\8restDay.json',"r") as f:
-        restday = json.load(f)
     RMmail.getHome()
     while True:
         if datetime.now().strftime('%d %H:%M') == "01 01:00":
