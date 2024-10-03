@@ -137,20 +137,20 @@ def main():
         driver.get("https://mail.worksmobile.com/")
         getHome(driver)
         if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')]:
-            for i in range(100):
+            for i in range(50):
                 newMail(driver)
                 t.sleep(5)
             driver.quit()
             t.sleep(5)
         else:
             if time(8,0)<datetime.now().time()<=time(18,0):
-                for i in range(100):
+                for i in range(50):
                     emailClick(driver)
                     t.sleep(5)
                 driver.quit()
                 t.sleep(5)
             else:
-                for i in range(100):
+                for i in range(50):
                     newMail(driver)
                     t.sleep(5)
                 driver.quit()
