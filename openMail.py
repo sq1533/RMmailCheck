@@ -142,7 +142,6 @@ def main():
                 t.sleep(5)
             driver.quit()
             t.sleep(5)
-            main()
         else:
             if time(8,0)<datetime.now().time()<=time(18,0):
                 for i in range(100):
@@ -150,19 +149,20 @@ def main():
                     t.sleep(5)
                 driver.quit()
                 t.sleep(5)
-                main()
             else:
                 for i in range(100):
                     newMail(driver)
                     t.sleep(5)
                 driver.quit()
                 t.sleep(5)
-                main()
         t.sleep(0.5)
-    except:
+    except Exception:
         driver.quit()
         t.sleep(5)
-        main()
+    finally:
+        driver.quit()
 
 if __name__ == "__main__":
-    while True:main()
+    while True:
+        main()
+        t.sleep(0.5)
