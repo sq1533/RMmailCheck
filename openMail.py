@@ -1,20 +1,12 @@
+from selenium import webdriver
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
 import time as t
 import requests
 import json
 import pandas as pd
-from selenium import webdriver
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException
 from bs4 import BeautifulSoup
 from datetime import datetime, time
-options = webdriver.ChromeOptions()
-options.add_argument("--headless")
-options.add_argument('--disable-gpu')
-options.add_argument("--disable-javascript")
-options.add_argument('--disable-extensions')
-options.add_argument('--blink-settings=imagesEnabled=false')
-driver = webdriver.Chrome(options=options)
 with open('C:\\Users\\USER\\ve_1\\DB\\3loginInfo.json', 'r', encoding='utf-8') as f:
     login_info = json.load(f)
 with open('C:\\Users\\USER\\ve_1\\DB\\6faxInfo.json', 'r',encoding='utf-8') as f:
@@ -67,121 +59,110 @@ def read_mail(soup):
         else:
             pass
     return newdata
-class RM:
-    #매월 1일 데이터 초기화
-    def reset(self):
-        resets = {
-            "상점ID":"T_ID",
-            "상점명":"T_Name",
-            "월한도":"1000000",
-            "비고":"",
-        }
-        pd.DataFrame(resets,index=[0]).to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
-        #텔레그램 API 전송
-        requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text=초기화_완료")
-        t.sleep(61)
-    def getHome(self):
-        driver.get("https://mail.worksmobile.com/")
+#매월 1일 데이터 초기화
+def reset():
+    resets = {
+        "상점ID":"T_ID",
+        "상점명":"T_Name",
+        "월한도":"1000000",
+        "비고":"",
+    }
+    pd.DataFrame(resets,index=[0]).to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
+    requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text=초기화_완료")
+    t.sleep(61)
+#페이지 로드
+def getHome(page):
+    t.sleep(1)
+    id_box = page.find_element(By.XPATH,'//input[@id="user_id"]')
+    login_button_1 = page.find_element(By.XPATH,'//button[@id="loginStart"]')
+    id = works_login['id']
+    ActionChains(page).send_keys_to_element(id_box, '{}'.format(id)).click(login_button_1).perform()
+    t.sleep(1)
+    password_box = page.find_element(By.XPATH,'//input[@id="user_pwd"]')
+    login_button_2 = page.find_element(By.XPATH,'//button[@id="loginBtn"]')
+    password = works_login['pw']
+    ActionChains(page).send_keys_to_element(password_box, '{}'.format(password)).click(login_button_2).perform()
+    t.sleep(1)
+def newMail(page):
+    page.get("https://mail.worksmobile.com/#/my/102")
+    t.sleep(2)
+    mailHome_soup = BeautifulSoup(page.page_source,'html.parser')
+    if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
+        newMail = page.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
+        ActionChains(page).click(newMail).perform()
         t.sleep(1)
-        id_box = driver.find_element(By.XPATH,'//input[@id="user_id"]')
-        login_button_1 = driver.find_element(By.XPATH,'//button[@id="loginStart"]')
-        id = works_login['id']
-        ActionChains(driver).send_keys_to_element(id_box, '{}'.format(id)).click(login_button_1).perform()
-        t.sleep(1)
-        password_box = driver.find_element(By.XPATH,'//input[@id="user_pwd"]')
-        login_button_2 = driver.find_element(By.XPATH,'//button[@id="loginBtn"]')
-        password = works_login['pw']
-        ActionChains(driver).send_keys_to_element(password_box, '{}'.format(password)).click(login_button_2).perform()
-        t.sleep(1)
-    def newMail(self):
-        try:
-            driver.get("https://mail.worksmobile.com/#/my/102")
-            t.sleep(2)
-            mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
-            if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
-                newMail = driver.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
-                ActionChains(driver).click(newMail).perform()
-                t.sleep(1)
-                mail_soup = BeautifulSoup(driver.page_source,'html.parser')
-                if read_mail(mail_soup).empty:
-                    tell = "{일}일 {시간}시 증액 필요 가맹점 없음".format(일=datetime.now().day,시간=datetime.now().hour)
-                    requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text={tell}")
-                else:
-                    for update in read_mail(mail_soup).index.tolist():
-                        tell = '{일}일 {시간}시 {상점명}[{상점ID}] 한도 증액필요\n월한도 {한도}원 / 증액 {증액}원'.format(
-                            일=datetime.now().day,
-                            시간=datetime.now().hour,
-                            상점명=read_mail(mail_soup).loc[update]["상점명"],
-                            상점ID=read_mail(mail_soup).loc[update]["상점ID"],
-                            한도=comma(int(read_mail(mail_soup).loc[update]["월한도"])),
-                            증액=comma(int(read_mail(mail_soup).loc[update]["월한도"])*120/100))
-                        requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text={tell}")
-                        RM_month = pd.read_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',dtype={'상점ID':str,'상점명':str,'월한도':str,'비고':str})
-                        if update == read_mail(mail_soup).index.tolist()[-1]:
-                            resurts = pd.concat([RM_month,read_mail(mail_soup)],ignore_index=True)
-                            resurts.to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
-                        else:pass
-                t.sleep(60*58)
-            else:pass
-        except TimeoutException:
-            driver.quit()
-            t.sleep(5)
-            RM.getHome()
-    def emailClick(self):
-        try:
-            driver.get("https://mail.worksmobile.com/#/my/102")
-            t.sleep(2)
-            mailHome_soup = BeautifulSoup(driver.page_source,'html.parser')
-            if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
-                newMail = driver.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
-                ActionChains(driver).click(newMail).perform()
-                driver.get("https://mail.worksmobile.com/#/my/102")
-                t.sleep(60*58)
-            else:pass
-        except TimeoutException:
-            driver.quit()
-            t.sleep(5)
-            RM.getHome()
-    #종료
-    def logout(self):
-        try:
-            logout_profile = driver.find_element(By.XPATH,'//div[@class="profile_area"]')
-            logout_btn = driver.find_element(By.XPATH,'//a[@class="btn logout"]')
-            ActionChains(driver).click(logout_profile).click(logout_btn).perform()
-            t.sleep(1)
-        except TimeoutException:
-            driver.quit()
-            t.sleep(5)
-            RM.getHome()
-    def login(self):
-        try:
-            password_box = driver.find_element(By.XPATH,'//input[@id="user_pwd"]')
-            login_button_2 = driver.find_element(By.XPATH,'//button[@id="loginBtn"]')
-            password = works_login['pw']
-            ActionChains(driver).send_keys_to_element(password_box, '{}'.format(password)).click(login_button_2).perform()
-            t.sleep(1)
-        except TimeoutException:
-            driver.quit()
-            t.sleep(5)
-            RM.getHome()
-RMmail = RM()
-if __name__ == "__main__":
-    RMmail.getHome()
-    while True:
+        mail_soup = BeautifulSoup(page.page_source,'html.parser')
+        if read_mail(mail_soup).empty:
+            tell = "{일}일 {시간}시 증액 필요 가맹점 없음".format(일=datetime.now().day,시간=datetime.now().hour)
+            requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text={tell}")
+        else:
+            for update in read_mail(mail_soup).index.tolist():
+                tell = '{일}일 {시간}시 {상점명}[{상점ID}] 한도 증액필요\n월한도 {한도}원 / 증액 {증액}원'.format(
+                    일=datetime.now().day,
+                    시간=datetime.now().hour,
+                    상점명=read_mail(mail_soup).loc[update]["상점명"],
+                    상점ID=read_mail(mail_soup).loc[update]["상점ID"],
+                    한도=comma(int(read_mail(mail_soup).loc[update]["월한도"])),
+                    증액=comma(int(read_mail(mail_soup).loc[update]["월한도"])*120/100))
+                requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text={tell}")
+                RM_month = pd.read_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',dtype={'상점ID':str,'상점명':str,'월한도':str,'비고':str})
+                if update == read_mail(mail_soup).index.tolist()[-1]:
+                    resurts = pd.concat([RM_month,read_mail(mail_soup)],ignore_index=True)
+                    resurts.to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
+                else:pass
+        t.sleep(60*58)
+    else:pass
+def emailClick(page):
+    page.get("https://mail.worksmobile.com/#/my/102")
+    t.sleep(2)
+    mailHome_soup = BeautifulSoup(page.page_source,'html.parser')
+    if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
+        newMail = page.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
+        ActionChains(page).click(newMail).perform()
+        page.get("https://mail.worksmobile.com/#/my/102")
+        t.sleep(60*58)
+    else:pass
+def main():
+    options = webdriver.ChromeOptions()
+    options.add_argument("--headless")
+    options.add_argument('--disable-gpu')
+    options.add_argument("--disable-javascript")
+    options.add_argument('--disable-extensions')
+    options.add_argument('--blink-settings=imagesEnabled=false')
+    driver = webdriver.Chrome(options=options)
+    try:
         if datetime.now().strftime('%d %H:%M') == "01 01:00":
-            RMmail.reset()
+            reset()
         else:pass
-        for i in range(100):
-            if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')]:
-                RMmail.newMail()
+        driver.get("https://mail.worksmobile.com/")
+        getHome(driver)
+        if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')]:
+            for i in range(100):
+                newMail(driver)
                 t.sleep(5)
+            driver.quit()
+            t.sleep(5)
+            main()
+        else:
+            if time(8,0)<datetime.now().time()<=time(18,0):
+                for i in range(100):
+                    emailClick(driver)
+                    t.sleep(5)
+                driver.quit()
+                t.sleep(5)
+                main()
             else:
-                if time(8,0)<datetime.now().time()<=time(18,0):
-                    RMmail.emailClick()
+                for i in range(100):
+                    newMail(driver)
                     t.sleep(5)
-                else:
-                    RMmail.newMail()
-                    t.sleep(5)
-        RMmail.logout
-        RMmail.login
+                driver.quit()
+                t.sleep(5)
+                main()
         t.sleep(0.5)
+    except:
+        driver.quit()
+        t.sleep(5)
+        main()
+
+if __name__ == "__main__":
+    while True:main()
