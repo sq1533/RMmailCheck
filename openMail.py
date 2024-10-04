@@ -1,3 +1,5 @@
+import os
+import sys
 from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
@@ -125,19 +127,19 @@ def emailClick(page):
 workTime = ["08:00","10:00","12:00","14:00","16:00"]
 restTime = ["00:00","02:00","04:00","06:00","18:00","20:00","22:00"]
 def main():
-    options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
-    options.add_argument('--disable-gpu')
-    options.add_argument("--disable-javascript")
-    options.add_argument('--disable-extensions')
-    options.add_argument('--blink-settings=imagesEnabled=false')
-    driver = webdriver.Chrome(options=options)
     try:
         if datetime.now().strftime('%d %H:%M') == "01 01:00":
             reset()
         else:pass
         if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')]:
             if datetime.now().strftime('%H:%M') in workTime or datetime.now().strftime('%H:%M') in restTime:
+                options = webdriver.ChromeOptions()
+                options.add_argument("--headless")
+                options.add_argument('--disable-gpu')
+                options.add_argument("--disable-javascript")
+                options.add_argument('--disable-extensions')
+                options.add_argument('--blink-settings=imagesEnabled=false')
+                driver = webdriver.Chrome(options=options)
                 driver.get("https://mail.worksmobile.com/")
                 getHome(driver)
                 for i in range(10):
@@ -147,6 +149,13 @@ def main():
             else:pass
         else:
             if datetime.now().strftime('%H:%M') in workTime:
+                options = webdriver.ChromeOptions()
+                options.add_argument("--headless")
+                options.add_argument('--disable-gpu')
+                options.add_argument("--disable-javascript")
+                options.add_argument('--disable-extensions')
+                options.add_argument('--blink-settings=imagesEnabled=false')
+                driver = webdriver.Chrome(options=options)
                 driver.get("https://mail.worksmobile.com/")
                 getHome(driver)
                 for i in range(10):
@@ -154,6 +163,13 @@ def main():
                     t.sleep(5)
                 driver.quit()
             elif datetime.now().strftime('%H:%M') in restTime:
+                options = webdriver.ChromeOptions()
+                options.add_argument("--headless")
+                options.add_argument('--disable-gpu')
+                options.add_argument("--disable-javascript")
+                options.add_argument('--disable-extensions')
+                options.add_argument('--blink-settings=imagesEnabled=false')
+                driver = webdriver.Chrome(options=options)
                 driver.get("https://mail.worksmobile.com/")
                 getHome(driver)
                 for i in range(10):
@@ -163,12 +179,8 @@ def main():
             else:pass
         t.sleep(0.5)
     except Exception:
-        driver.quit()
         t.sleep(5)
-    finally:
-        driver.quit()
-        t.sleep(5)
-
+        os.execl(sys.executable, sys.executable, *sys.argv)
 if __name__ == "__main__":
     while True:
         main()
