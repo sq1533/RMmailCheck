@@ -2,11 +2,11 @@ from selenium import webdriver
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.by import By
 import time as t
+from datetime import datetime, time
 import requests
 import json
 import pandas as pd
 from bs4 import BeautifulSoup
-from datetime import datetime, time
 with open('C:\\Users\\USER\\ve_1\\DB\\3loginInfo.json', 'r', encoding='utf-8') as f:
     login_info = json.load(f)
 with open('C:\\Users\\USER\\ve_1\\DB\\6faxInfo.json', 'r',encoding='utf-8') as f:
@@ -110,7 +110,7 @@ def newMail(page):
                     resurts = pd.concat([RM_month,read_mail(mail_soup)],ignore_index=True)
                     resurts.to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
                 else:pass
-        t.sleep(60*58)
+        t.sleep(60)
     else:pass
 def emailClick(page):
     page.get("https://mail.worksmobile.com/#/my/102")
@@ -120,8 +120,10 @@ def emailClick(page):
         newMail = page.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
         ActionChains(page).click(newMail).perform()
         page.get("https://mail.worksmobile.com/#/my/102")
-        t.sleep(60*58)
+        t.sleep(60)
     else:pass
+workTime = ["08:00","10:00","12:00","14:00","16:00"]
+restTime = ["00:00","02:00","04:00","06:00","18:00","20:00","22:00"]
 def main():
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
@@ -134,33 +136,38 @@ def main():
         if datetime.now().strftime('%d %H:%M') == "01 01:00":
             reset()
         else:pass
-        driver.get("https://mail.worksmobile.com/")
-        getHome(driver)
         if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')]:
-            for i in range(50):
-                newMail(driver)
-                t.sleep(5)
-            driver.quit()
-            t.sleep(5)
-        else:
-            if time(8,0)<datetime.now().time()<=time(18,0):
-                for i in range(50):
-                    emailClick(driver)
-                    t.sleep(5)
-                driver.quit()
-                t.sleep(5)
-            else:
-                for i in range(50):
+            if datetime.now().strftime('%H:%M') in workTime or datetime.now().strftime('%H:%M') in restTime:
+                driver.get("https://mail.worksmobile.com/")
+                getHome(driver)
+                for i in range(10):
                     newMail(driver)
                     t.sleep(5)
                 driver.quit()
-                t.sleep(5)
+            else:pass
+        else:
+            if datetime.now().strftime('%H:%M') in workTime:
+                driver.get("https://mail.worksmobile.com/")
+                getHome(driver)
+                for i in range(10):
+                    emailClick(driver)
+                    t.sleep(5)
+                driver.quit()
+            elif datetime.now().strftime('%H:%M') in restTime:
+                driver.get("https://mail.worksmobile.com/")
+                getHome(driver)
+                for i in range(10):
+                    newMail(driver)
+                    t.sleep(5)
+                driver.quit()
+            else:pass
         t.sleep(0.5)
     except Exception:
         driver.quit()
         t.sleep(5)
     finally:
         driver.quit()
+        t.sleep(5)
 
 if __name__ == "__main__":
     while True:
