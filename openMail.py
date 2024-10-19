@@ -11,13 +11,10 @@ import pandas as pd
 from bs4 import BeautifulSoup
 with open('C:\\Users\\USER\\ve_1\\DB\\3loginInfo.json', 'r', encoding='utf-8') as f:
     login_info = json.load(f)
-with open('C:\\Users\\USER\\ve_1\\DB\\6faxInfo.json', 'r',encoding='utf-8') as f:
-    fax_info = json.load(f)
 with open('C:\\Users\\USER\\ve_1\\DB\\8restDay.json',"r") as f:
     restday = json.load(f)
 tele_bot = pd.Series(login_info['bot'])
 works_login = pd.Series(login_info['worksMail'])
-fax = pd.DataFrame(fax_info)
 #숫자 콤마넣기
 def comma(x):
     return '{:,}'.format(round(x))
@@ -112,7 +109,6 @@ def newMail(page):
                     resurts = pd.concat([RM_month,read_mail(mail_soup)],ignore_index=True)
                     resurts.to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
                 else:pass
-        t.sleep(60)
     else:pass
 def emailClick(page):
     page.get("https://mail.worksmobile.com/#/my/102")
@@ -121,64 +117,63 @@ def emailClick(page):
     if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
         newMail = page.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
         ActionChains(page).click(newMail).perform()
-        page.get("https://mail.worksmobile.com/#/my/102")
-        t.sleep(60)
     else:pass
 workTime = ["08:00","10:00","12:00","14:00","16:00"]
 restTime = ["00:00","02:00","04:00","06:00","18:00","20:00","22:00"]
 def main():
-    try:
-        if datetime.now().strftime('%d %H:%M') == "01 01:00":
-            reset()
-        else:pass
-        if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')]:
-            if datetime.now().strftime('%H:%M') in workTime or datetime.now().strftime('%H:%M') in restTime:
-                options = webdriver.ChromeOptions()
-                options.add_argument("--headless")
-                options.add_argument('--disable-gpu')
-                options.add_argument('--disable-extensions')
-                options.add_argument('--blink-settings=imagesEnabled=false')
-                driver = webdriver.Chrome(options=options)
-                driver.get("https://mail.worksmobile.com/")
-                getHome(driver)
-                for i in range(10):
-                    newMail(driver)
-                    t.sleep(5)
-                driver.quit()
-            else:pass
-        else:
-            if datetime.now().strftime('%H:%M') in workTime:
-                options = webdriver.ChromeOptions()
-                options.add_argument("--headless")
-                options.add_argument('--disable-gpu')
-                options.add_argument('--disable-extensions')
-                options.add_argument('--blink-settings=imagesEnabled=false')
-                driver = webdriver.Chrome(options=options)
-                driver.get("https://mail.worksmobile.com/")
-                getHome(driver)
-                for i in range(10):
-                    emailClick(driver)
-                    t.sleep(5)
-                driver.quit()
-            elif datetime.now().strftime('%H:%M') in restTime:
-                options = webdriver.ChromeOptions()
-                options.add_argument("--headless")
-                options.add_argument('--disable-gpu')
-                options.add_argument('--disable-extensions')
-                options.add_argument('--blink-settings=imagesEnabled=false')
-                driver = webdriver.Chrome(options=options)
-                driver.get("https://mail.worksmobile.com/")
-                getHome(driver)
-                for i in range(10):
-                    newMail(driver)
-                    t.sleep(5)
-                driver.quit()
-            else:pass
-        t.sleep(0.5)
-    except Exception:
-        t.sleep(2)
-        os.execl(sys.executable, sys.executable, *sys.argv)
-if __name__ == "__main__":
     while True:
-        main()
-        t.sleep(0.5)
+        try:
+            if datetime.now().strftime('%d %H:%M') == "01 01:00":
+                reset()
+            else:pass
+            if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')]:
+                if datetime.now().strftime('%H:%M') in list(set(workTime)|set(restTime)):
+                    options = webdriver.ChromeOptions()
+                    options.add_argument("--headless")
+                    options.add_argument('--disable-gpu')
+                    options.add_argument('--disable-extensions')
+                    options.add_argument('--blink-settings=imagesEnabled=false')
+                    driver = webdriver.Chrome(options=options)
+                    driver.get("https://mail.worksmobile.com/")
+                    getHome(driver)
+                    for i in range(10):
+                        newMail(driver)
+                        t.sleep(3)
+                    driver.quit()
+                    t.sleep(3600)
+                else:pass
+            else:
+                if datetime.now().strftime('%H:%M') in workTime:
+                    options = webdriver.ChromeOptions()
+                    options.add_argument("--headless")
+                    options.add_argument('--disable-gpu')
+                    options.add_argument('--disable-extensions')
+                    options.add_argument('--blink-settings=imagesEnabled=false')
+                    driver = webdriver.Chrome(options=options)
+                    driver.get("https://mail.worksmobile.com/")
+                    getHome(driver)
+                    for i in range(10):
+                        emailClick(driver)
+                        t.sleep(3)
+                    driver.quit()
+                    t.sleep(3600)
+                elif datetime.now().strftime('%H:%M') in restTime:
+                    options = webdriver.ChromeOptions()
+                    options.add_argument("--headless")
+                    options.add_argument('--disable-gpu')
+                    options.add_argument('--disable-extensions')
+                    options.add_argument('--blink-settings=imagesEnabled=false')
+                    driver = webdriver.Chrome(options=options)
+                    driver.get("https://mail.worksmobile.com/")
+                    getHome(driver)
+                    for i in range(10):
+                        newMail(driver)
+                        t.sleep(3)
+                    driver.quit()
+                    t.sleep(3600)
+                else:pass
+            t.sleep(0.5)
+        except Exception:
+            t.sleep(2)
+            os.execl(sys.executable, sys.executable, *sys.argv)
+if __name__ == "__main__":main()
