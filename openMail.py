@@ -172,6 +172,7 @@ def main():
                 else:pass
             t.sleep(0.5)
         except Exception:
+            driver.quit()
             t.sleep(2)
             os.execl(sys.executable, sys.executable, *sys.argv)
 if __name__ == "__main__":main()
