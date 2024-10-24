@@ -13,7 +13,7 @@ with open('C:\\Users\\USER\\ve_1\\DB\\3loginInfo.json', 'r', encoding='utf-8') a
     login_info = json.load(f)
 with open('C:\\Users\\USER\\ve_1\\DB\\8restDay.json',"r") as f:
     restday = json.load(f)
-tele_bot = pd.Series(login_info['bot'])
+tele_bot = pd.Series(login_info['RMbot'])
 works_login = pd.Series(login_info['worksMail'])
 #숫자 콤마넣기
 def comma(x):
