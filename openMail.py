@@ -140,7 +140,7 @@ def main():
                         newMail(driver)
                         t.sleep(3)
                     driver.quit()
-                    t.sleep(3600)
+                    t.sleep(3000)
                 else:pass
             else:
                 if datetime.now().strftime('%H:%M') in workTime:
@@ -156,7 +156,7 @@ def main():
                         emailClick(driver)
                         t.sleep(3)
                     driver.quit()
-                    t.sleep(3600)
+                    t.sleep(3000)
                 elif datetime.now().strftime('%H:%M') in restTime:
                     options = webdriver.ChromeOptions()
                     options.add_argument("--headless")
@@ -170,7 +170,7 @@ def main():
                         newMail(driver)
                         t.sleep(3)
                     driver.quit()
-                    t.sleep(3600)
+                    t.sleep(3000)
                 else:pass
             t.sleep(0.5)
         except Exception:
