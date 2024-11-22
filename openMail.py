@@ -11,7 +11,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 with open('C:\\Users\\USER\\ve_1\\DB\\3loginInfo.json', 'r', encoding='utf-8') as f:
     login_info = json.load(f)
-with open('C:\\Users\\USER\\ve_1\\DB\\8restDay.json',"r") as f:
+with open('C:\\Users\\USER\\ve_1\\DB\\restDay.json',"r") as f:
     restday = json.load(f)
 tele_bot = pd.Series(login_info['RMbot'])
 works_login = pd.Series(login_info['worksMail'])
