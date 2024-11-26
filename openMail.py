@@ -16,7 +16,7 @@ with open('C:\\Users\\USER\\ve_1\\DB\\restDay.json',"r") as f:
 tele_bot = pd.Series(login_info['RMbot'])
 works_login = pd.Series(login_info['worksMail'])
 #숫자 콤마넣기
-def comma(x):
+def comma(x) -> None:
     return '{:,}'.format(round(x))
 def read_mail(soup):
     #RM한도 증액 제외 가맹점
@@ -59,7 +59,7 @@ def read_mail(soup):
             pass
     return newdata
 #매월 1일 데이터 초기화
-def reset():
+def reset() -> None:
     resets = {
         "상점ID":"T_ID",
         "상점명":"T_Name",
@@ -70,7 +70,7 @@ def reset():
     requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text=초기화_완료")
     t.sleep(61)
 #페이지 로드
-def getHome(page):
+def getHome(page) -> None:
     t.sleep(1)
     id_box = page.find_element(By.XPATH,'//input[@id="user_id"]')
     login_button_1 = page.find_element(By.XPATH,'//button[@id="loginStart"]')
@@ -82,7 +82,7 @@ def getHome(page):
     password = works_login['pw']
     ActionChains(page).send_keys_to_element(password_box, '{}'.format(password)).click(login_button_2).perform()
     t.sleep(1)
-def newMail(page):
+def newMail(page) -> None:
     page.get("https://mail.worksmobile.com/#/my/102")
     t.sleep(2)
     mailHome_soup = BeautifulSoup(page.page_source,'html.parser')
