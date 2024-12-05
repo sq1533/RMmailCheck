@@ -46,7 +46,7 @@ def read_mail(soup):
             break
     newdata = pd.DataFrame(data={"상점ID":marketID,"상점명":marketName,"월한도":marketPrice,"비고":order})
     #불필요 및 중복 데이터 분류
-    RM_month = pd.read_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',dtype={'상점ID':str,'상점명':str,'월한도':str,'비고':str})
+    RM_month = pd.read_json('C:\\Users\\USER\\ve_1\\DB\\rmMail.json',orient='records',dtype={'상점ID':str,'상점명':str,'월한도':str,'비고':str})
     lastID = RM_month['상점ID'].tolist()
     for n in newdata.index.tolist():
         if any(nm in str(newdata.loc[n]["상점명"]) for nm in ignoreName):
@@ -66,7 +66,7 @@ def reset() -> None:
         "월한도":"1000000",
         "비고":"",
     }
-    pd.DataFrame(resets,index=[0]).to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
+    pd.DataFrame(resets,index=[0]).to_json('C:\\Users\\USER\\ve_1\\DB\\rmMail.json',orient='records',force_ascii=False,indent=4)
     requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text=초기화_완료")
     t.sleep(61)
 #페이지 로드
@@ -104,10 +104,10 @@ def newMail(page) -> None:
                     한도=comma(int(read_mail(mail_soup).loc[update]["월한도"])),
                     증액=comma(int(read_mail(mail_soup).loc[update]["월한도"])*120/100))
                 requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text={tell}")
-                RM_month = pd.read_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',dtype={'상점ID':str,'상점명':str,'월한도':str,'비고':str})
+                RM_month = pd.read_json('C:\\Users\\USER\\ve_1\\DB\\rmMail.json',orient='records',dtype={'상점ID':str,'상점명':str,'월한도':str,'비고':str})
                 if update == read_mail(mail_soup).index.tolist()[-1]:
                     resurts = pd.concat([RM_month,read_mail(mail_soup)],ignore_index=True)
-                    resurts.to_json('C:\\Users\\USER\\ve_1\\DB\\7rmMail.json',orient='records',force_ascii=False,indent=4)
+                    resurts.to_json('C:\\Users\\USER\\ve_1\\DB\\rmMail.json',orient='records',force_ascii=False,indent=4)
                 else:pass
     else:pass
 def emailClick(page):
