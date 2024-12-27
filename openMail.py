@@ -19,8 +19,19 @@ with open(restDayPath,"r") as f:
 works_login = pd.Series(login_info['worksMail'])
 tele_bot = pd.Series(login_info['RMbot'])
 #숫자 콤마넣기
-def comma(x) -> None:
+def comma(x):
     return '{:,}'.format(round(x))
+#매월 1일 데이터 초기화
+def reset() -> None:
+    resets = {
+        "상점ID":"T_ID",
+        "상점명":"T_Name",
+        "월한도":"1000000",
+        "비고":""
+    }
+    pd.DataFrame(resets,index=[0]).to_json(rmMailPath,orient='records',force_ascii=False,indent=4)
+    requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text=초기화_완료")
+    t.sleep(61)
 def read_mail(soup):
     #RM한도 증액 제외 가맹점
     ignoreName = ["이지피쥐","핀테크링크​","엘피엔지​","코리아결제시스템"]
@@ -61,19 +72,10 @@ def read_mail(soup):
         else:
             pass
     return newdata
-#매월 1일 데이터 초기화
-def reset() -> None:
-    resets = {
-        "상점ID":"T_ID",
-        "상점명":"T_Name",
-        "월한도":"1000000",
-        "비고":""
-    }
-    pd.DataFrame(resets,index=[0]).to_json(rmMailPath,orient='records',force_ascii=False,indent=4)
-    requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text=초기화_완료")
-    t.sleep(61)
+
 #페이지 로드
 def getHome(page) -> None:
+    page.get("https://mail.worksmobile.com/")
     t.sleep(1)
     id_box = page.find_element(By.XPATH,'//input[@id="user_id"]')
     login_button_1 = page.find_element(By.XPATH,'//button[@id="loginStart"]')
@@ -113,7 +115,7 @@ def newMail(page) -> None:
                     resurts.to_json(rmMailPath,orient='records',force_ascii=False,indent=4)
                 else:pass
     else:pass
-def emailClick(page):
+def emailClick(page) -> None:
     page.get("https://mail.worksmobile.com/#/my/102")
     t.sleep(2)
     mailHome_soup = BeautifulSoup(page.page_source,'html.parser')
@@ -124,36 +126,27 @@ def emailClick(page):
 workTime = ["08:00","10:00","12:00","14:00","16:00"]
 restTime = ["00:00","02:00","04:00","06:00","18:00","20:00","22:00"]
 def main():
+    options = webdriver.ChromeOptions()
+    options.add_argument('--blink-settings=imagesEnabled=false')
+    driver = webdriver.Chrome(options=options)
     while True:
         try:
             if datetime.now().strftime('%d %H:%M') == "01 01:00":
                 reset()
-            else:pass
+            else:
+                pass
             if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')]:
                 if datetime.now().strftime('%H:%M') in list(set(workTime)|set(restTime)):
-                    options = webdriver.ChromeOptions()
-                    options.add_argument("--headless")
-                    options.add_argument('--disable-gpu')
-                    options.add_argument('--disable-extensions')
-                    options.add_argument('--blink-settings=imagesEnabled=false')
-                    driver = webdriver.Chrome(options=options)
-                    driver.get("https://mail.worksmobile.com/")
                     getHome(driver)
                     for i in range(10):
                         newMail(driver)
                         t.sleep(3)
                     driver.quit()
                     t.sleep(3000)
-                else:pass
+                else:
+                    pass
             else:
                 if datetime.now().strftime('%H:%M') in workTime:
-                    options = webdriver.ChromeOptions()
-                    options.add_argument("--headless")
-                    options.add_argument('--disable-gpu')
-                    options.add_argument('--disable-extensions')
-                    options.add_argument('--blink-settings=imagesEnabled=false')
-                    driver = webdriver.Chrome(options=options)
-                    driver.get("https://mail.worksmobile.com/")
                     getHome(driver)
                     for i in range(10):
                         emailClick(driver)
@@ -161,20 +154,14 @@ def main():
                     driver.quit()
                     t.sleep(3000)
                 elif datetime.now().strftime('%H:%M') in restTime:
-                    options = webdriver.ChromeOptions()
-                    options.add_argument("--headless")
-                    options.add_argument('--disable-gpu')
-                    options.add_argument('--disable-extensions')
-                    options.add_argument('--blink-settings=imagesEnabled=false')
-                    driver = webdriver.Chrome(options=options)
-                    driver.get("https://mail.worksmobile.com/")
                     getHome(driver)
                     for i in range(10):
                         newMail(driver)
                         t.sleep(3)
                     driver.quit()
                     t.sleep(3000)
-                else:pass
+                else:
+                    pass
             t.sleep(0.5)
         except Exception:
             t.sleep(2)
