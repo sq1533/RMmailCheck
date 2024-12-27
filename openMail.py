@@ -125,10 +125,10 @@ def emailClick(page) -> None:
 workTime = ["08:00","10:00","12:00","14:00","16:00"]
 restTime = ["00:00","02:00","04:00","06:00","18:00","20:00","22:00"]
 def main():
+    options = webdriver.ChromeOptions()
+    options.add_argument('--blink-settings=imagesEnabled=false')
+    driver = webdriver.Chrome(options=options)
     while True:
-        options = webdriver.ChromeOptions()
-        options.add_argument('--blink-settings=imagesEnabled=false')
-        driver = webdriver.Chrome(options=options)
         try:
             if datetime.now().strftime('%d %H:%M') == "01 01:00":
                 reset()
@@ -140,7 +140,6 @@ def main():
                     for i in range(10):
                         newMail(driver)
                         t.sleep(3)
-                    driver.quit()
                     t.sleep(3000)
                 else:
                     pass
@@ -150,14 +149,12 @@ def main():
                     for i in range(10):
                         emailClick(driver)
                         t.sleep(3)
-                    driver.quit()
                     t.sleep(3000)
                 elif datetime.now().strftime('%H:%M') in restTime:
                     getHome(driver)
                     for i in range(10):
                         newMail(driver)
                         t.sleep(3)
-                    driver.quit()
                     t.sleep(3000)
                 else:
                     pass
