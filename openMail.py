@@ -72,7 +72,6 @@ def read_mail(soup):
         else:
             pass
     return newdata
-
 #페이지 로드
 def getHome(page) -> None:
     page.get("https://mail.worksmobile.com/")
