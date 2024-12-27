@@ -141,6 +141,7 @@ def main():
                     for i in range(10):
                         newMail(driver)
                         t.sleep(3)
+                    driver.quit()
                     t.sleep(3000)
                 else:
                     pass
@@ -149,11 +150,13 @@ def main():
                     for i in range(10):
                         emailClick(driver)
                         t.sleep(3)
+                    driver.quit()
                     t.sleep(3000)
                 elif datetime.now().strftime('%H:%M') in restTime:
                     for i in range(10):
                         newMail(driver)
                         t.sleep(3)
+                    driver.quit()
                     t.sleep(3000)
                 else:
                     pass
