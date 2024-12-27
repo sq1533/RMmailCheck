@@ -9,8 +9,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
-loginPath = os.path.join(os.path.dirname(__file__),"DB","1loginInfo.json")
-restDayPath = os.path.join(os.path.dirname(__file__),"DB","restDay.json")
+loginPath = os.path.join(os.path.dirname(__file__),"..","loginInfo.json")
+restDayPath = os.path.join(os.path.dirname(__file__),"..","restDay.json")
 rmMailPath = os.path.join(os.path.dirname(__file__),"DB","rmMail.json")
 with open(loginPath, 'r', encoding='utf-8') as f:
     login_info = json.load(f)
@@ -67,7 +67,7 @@ def reset() -> None:
         "상점ID":"T_ID",
         "상점명":"T_Name",
         "월한도":"1000000",
-        "비고":"",
+        "비고":""
     }
     pd.DataFrame(resets,index=[0]).to_json(rmMailPath,orient='records',force_ascii=False,indent=4)
     requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text=초기화_완료")
