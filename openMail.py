@@ -86,8 +86,9 @@ def getHome(page) -> None:
     password = works_login['pw']
     ActionChains(page).send_keys_to_element(password_box, '{}'.format(password)).click(login_button_2).perform()
     t.sleep(1)
-def newMail(page) -> None:
     page.get("https://mail.worksmobile.com/#/my/102")
+def newMail(page) -> None:
+    page.refresh()
     t.sleep(2)
     mailHome_soup = BeautifulSoup(page.page_source,'html.parser')
     if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
