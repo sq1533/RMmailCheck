@@ -128,6 +128,7 @@ def main():
     options = webdriver.ChromeOptions()
     options.add_argument('--blink-settings=imagesEnabled=false')
     driver = webdriver.Chrome(options=options)
+    getHome(driver)
     while True:
         try:
             if datetime.now().strftime('%d %H:%M') == "01 01:00":
@@ -136,7 +137,6 @@ def main():
                 pass
             if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')]:
                 if datetime.now().strftime('%H:%M') in list(set(workTime)|set(restTime)):
-                    getHome(driver)
                     for i in range(10):
                         newMail(driver)
                         t.sleep(3)
@@ -145,13 +145,11 @@ def main():
                     pass
             else:
                 if datetime.now().strftime('%H:%M') in workTime:
-                    getHome(driver)
                     for i in range(10):
                         emailClick(driver)
                         t.sleep(3)
                     t.sleep(3000)
                 elif datetime.now().strftime('%H:%M') in restTime:
-                    getHome(driver)
                     for i in range(10):
                         newMail(driver)
                         t.sleep(3)
