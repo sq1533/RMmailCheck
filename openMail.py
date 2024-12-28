@@ -99,6 +99,7 @@ def newMail(page) -> None:
         if read_mail(mail_soup).empty:
             tell = "{일}일 {시간}시 증액 필요 가맹점 없음".format(일=datetime.now().day,시간=datetime.now().hour)
             requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text={tell}")
+            page.get("https://mail.worksmobile.com/#/my/102")
         else:
             for update in read_mail(mail_soup).index.tolist():
                 tell = '{일}일 {시간}시 {상점명}[{상점ID}] 한도 증액필요\n월한도 {한도}원 / 증액 {증액}원'.format(
@@ -114,15 +115,18 @@ def newMail(page) -> None:
                     resurts = pd.concat([RM_month,read_mail(mail_soup)],ignore_index=True)
                     resurts.to_json(rmMailPath,orient='records',force_ascii=False,indent=4)
                 else:pass
-    else:pass
+            page.get("https://mail.worksmobile.com/#/my/102")
+    else:
+        pass
 def emailClick(page) -> None:
-    page.get("https://mail.worksmobile.com/#/my/102")
+    page.refresh()
     t.sleep(2)
     mailHome_soup = BeautifulSoup(page.page_source,'html.parser')
     if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
         newMail = page.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
         ActionChains(page).click(newMail).perform()
-    else:pass
+    else:
+        pass
 workTime = ["08:00","10:00","12:00","14:00","16:00"]
 restTime = ["00:00","02:00","04:00","06:00","18:00","20:00","22:00"]
 def main():
@@ -141,7 +145,6 @@ def main():
                     for i in range(10):
                         newMail(driver)
                         t.sleep(3)
-                    driver.quit()
                     t.sleep(3000)
                 else:
                     pass
@@ -150,13 +153,11 @@ def main():
                     for i in range(10):
                         emailClick(driver)
                         t.sleep(3)
-                    driver.quit()
                     t.sleep(3000)
                 elif datetime.now().strftime('%H:%M') in restTime:
                     for i in range(10):
                         newMail(driver)
                         t.sleep(3)
-                    driver.quit()
                     t.sleep(3000)
                 else:
                     pass
