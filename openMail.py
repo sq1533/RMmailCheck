@@ -131,6 +131,7 @@ workTime = ["08:00","10:00","12:00","14:00","16:00"]
 restTime = ["00:00","02:00","04:00","06:00","18:00","20:00","22:00"]
 def main():
     options = webdriver.ChromeOptions()
+    options.add_argument('--headless')
     options.add_argument('--blink-settings=imagesEnabled=false')
     driver = webdriver.Chrome(options=options)
     getHome(driver)
