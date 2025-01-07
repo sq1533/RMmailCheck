@@ -139,12 +139,13 @@ def main():
     getHome(driver)
     while True:
         try:
-            if datetime.now().strftime('%d %H:%M') == "01 01:00":
+            today = datetime.now()
+            if today.strftime('%d %H:%M') == "01 01:00":
                 reset()
             else:
                 pass
-            if datetime.now().strftime('%d') in restday[datetime.now().strftime('%m')]:
-                if datetime.now().strftime('%H:%M') in list(set(workTime)|set(restTime)):
+            if (today.weekday() == 5) or (today.weekday() == 6) or (today.strftime('%d') in restday[datetime.now().strftime('%m')]):
+                if today.strftime('%H:%M') in list(set(workTime)|set(restTime)):
                     for i in range(10):
                         newMail(driver)
                         t.sleep(3)
@@ -152,12 +153,12 @@ def main():
                 else:
                     pass
             else:
-                if datetime.now().strftime('%H:%M') in workTime:
+                if today.strftime('%H:%M') in workTime:
                     for i in range(10):
                         emailClick(driver)
                         t.sleep(3)
                     t.sleep(3000)
-                elif datetime.now().strftime('%H:%M') in restTime:
+                elif today.strftime('%H:%M') in restTime:
                     for i in range(10):
                         newMail(driver)
                         t.sleep(3)
@@ -166,6 +167,7 @@ def main():
                     pass
             t.sleep(0.5)
         except Exception:
-            t.sleep(2)
+            t.sleep(1)
             os.execl(sys.executable, sys.executable, *sys.argv)
+
 if __name__ == "__main__":main()
