@@ -144,7 +144,7 @@ def main():
                 reset()
             else:
                 pass
-            if (today.weekday() == 5) or (today.weekday() == 6) or (today.strftime('%d') in restday[datetime.now().strftime('%m')]):
+            if (today.weekday() == 5) or (today.weekday() == 6) or (today.strftime('%d') in restday[today.strftime('%m')]):
                 if today.strftime('%H:%M') in list(set(workTime)|set(restTime)):
                     for i in range(10):
                         newMail(driver)
@@ -170,4 +170,5 @@ def main():
             t.sleep(1)
             os.execl(sys.executable, sys.executable, *sys.argv)
 
-if __name__ == "__main__":main()
+if __name__ == "__main__":
+    main()
