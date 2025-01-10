@@ -9,6 +9,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
+
 loginPath = os.path.join(os.path.dirname(__file__),"..","loginInfo.json")
 restDayPath = os.path.join(os.path.dirname(__file__),"..","restDay.json")
 rmMailPath = os.path.join(os.path.dirname(__file__),"DB","rmMail.json")
@@ -18,9 +19,11 @@ with open(restDayPath,"r") as f:
     restday = json.load(f)
 works_login = pd.Series(login_info['worksMail'])
 tele_bot = pd.Series(login_info['RMbot'])
+
 #숫자 콤마넣기
 def comma(x):
     return '{:,}'.format(round(x))
+
 #매월 1일 데이터 초기화
 def reset() -> None:
     resets = {
@@ -32,6 +35,8 @@ def reset() -> None:
     pd.DataFrame(resets,index=[0]).to_json(rmMailPath,orient='records',force_ascii=False,indent=4)
     requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text=초기화_완료")
     t.sleep(61)
+
+#RM한도 증액 가맹점 분류
 def read_mail(soup):
     #RM한도 증액 제외 가맹점
     ignoreName = ["이지피쥐","핀테크링크​","엘피엔지​","코리아결제시스템"]
@@ -72,6 +77,7 @@ def read_mail(soup):
         else:
             pass
     return newdata
+
 #페이지 로드
 def getHome(page) -> None:
     page.get("https://mail.worksmobile.com/")
@@ -87,6 +93,8 @@ def getHome(page) -> None:
     ActionChains(page).send_keys_to_element(password_box, '{}'.format(password)).click(login_button_2).perform()
     t.sleep(1)
     page.get("https://mail.worksmobile.com/#/my/102")
+
+#RM메일 확인
 def newMail(page) -> None:
     page.refresh()
     t.sleep(2)
@@ -118,6 +126,8 @@ def newMail(page) -> None:
             page.get("https://mail.worksmobile.com/#/my/102")
     else:
         pass
+
+#영업일 메일 체크
 def emailClick(page) -> None:
     page.refresh()
     t.sleep(2)
@@ -125,8 +135,10 @@ def emailClick(page) -> None:
     if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
         newMail = page.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
         ActionChains(page).click(newMail).perform()
+        page.get("https://mail.worksmobile.com/#/my/102")
     else:
         pass
+
 workTime = ["08:00","10:00","12:00","14:00","16:00"]
 restTime = ["00:00","02:00","04:00","06:00","18:00","20:00","22:00"]
 def main():
@@ -140,10 +152,12 @@ def main():
         getHome(driver)
         while True:
             today = datetime.now()
+            #데이터 리셋
             if today.strftime('%d %H:%M') == "01 01:00":
                 reset()
             else:
                 pass
+            #영업일 구분
             if (today.weekday() == 5) or (today.weekday() == 6) or (today.strftime('%d') in restday[today.strftime('%m')]):
                 if today.strftime('%H:%M') in list(set(workTime)|set(restTime)):
                     for i in range(10):
@@ -167,7 +181,7 @@ def main():
                     pass
             t.sleep(0.5)
     except Exception:
-        t.sleep(1)
+        t.sleep(2)
         os.execl(sys.executable, sys.executable, *sys.argv)
 
 if __name__ == "__main__":
