@@ -143,14 +143,14 @@ def emailClick(page) -> None:
 workTime = ["08:00","10:00","12:00","14:00","16:00"]
 restTime = ["00:00","02:00","04:00","06:00","18:00","20:00","22:00"]
 def main():
-    try:
-        options = Options()
-        options.add_argument('--headless')
-        options.add_argument('--disable-gpu')
-        options.add_argument('--disable-extensions')
-        driver = webdriver.Firefox(options=options)
-        getHome(driver)
-        while True:
+    options = Options()
+    options.add_argument('--headless')
+    options.add_argument('--disable-gpu')
+    options.add_argument('--disable-extensions')
+    driver = webdriver.Firefox(options=options)
+    getHome(driver)
+    while True:
+        try:
             today = datetime.now()
             #데이터 리셋
             if today.strftime('%d %H:%M') == "01 01:00":
@@ -180,10 +180,10 @@ def main():
                 else:
                     pass
             t.sleep(0.5)
-    except Exception:
-        driver.quit()
-        t.sleep(2)
-        os.execl(sys.executable, sys.executable, *sys.argv)
+        except Exception:
+            driver.quit()
+            t.sleep(2)
+            os.execl(sys.executable, sys.executable, *sys.argv)
 
 if __name__ == "__main__":
     main()
