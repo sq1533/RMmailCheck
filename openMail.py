@@ -81,7 +81,6 @@ def read_mail(soup):
 
 #페이지 로드
 def getHome(page) -> None:
-    page.get("https://mail.worksmobile.com/")
     t.sleep(1)
     id_box = page.find_element(By.XPATH,'//input[@id="user_id"]')
     login_button_1 = page.find_element(By.XPATH,'//button[@id="loginStart"]')
@@ -100,10 +99,11 @@ def newMail(page) -> None:
     page.refresh()
     t.sleep(2)
     mailHome_soup = BeautifulSoup(page.page_source,'html.parser')
-    if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
+    newMailCheck = mailHome_soup.find_all('li', attrs={'class':'notRead'})
+    if newMailCheck:
         newMail = page.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
         ActionChains(page).click(newMail).perform()
-        t.sleep(1)
+        t.sleep(2)
         mail_soup = BeautifulSoup(page.page_source,'html.parser')
         if read_mail(mail_soup).empty:
             tell = "{일}일 {시간}시 증액 필요 가맹점 없음".format(일=datetime.now().day,시간=datetime.now().hour)
@@ -133,57 +133,62 @@ def emailClick(page) -> None:
     page.refresh()
     t.sleep(2)
     mailHome_soup = BeautifulSoup(page.page_source,'html.parser')
-    if mailHome_soup.find('li', attrs={'class':'notRead'}) != None:
+    newMailCheck = mailHome_soup.find_all('li', attrs={'class':'notRead'})
+    if newMailCheck:
         newMail = page.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
         ActionChains(page).click(newMail).perform()
         page.get("https://mail.worksmobile.com/#/my/102")
     else:
         pass
 
+#메일 체크 시간
 workTime = ["08:00","10:00","12:00","14:00","16:00"]
 restTime = ["00:00","02:00","04:00","06:00","18:00","20:00","22:00"]
+#브라우저 호출
+options = Options()
+options.add_argument('--headless')
+options.add_argument('--disable-gpu')
+options.add_argument('--disable-extensions')
+driver = webdriver.Firefox(options=options)
+driver.get("https://mail.worksmobile.com/")
+getHome(driver)
+
 def main():
-    options = Options()
-    options.add_argument('--headless')
-    options.add_argument('--disable-gpu')
-    options.add_argument('--disable-extensions')
-    driver = webdriver.Firefox(options=options)
-    getHome(driver)
-    while True:
-        try:
-            today = datetime.now()
-            #데이터 리셋
-            if today.strftime('%d %H:%M') == "01 01:00":
-                reset()
+    try:
+        today = datetime.now()
+        #데이터 리셋
+        if today.strftime('%d %H:%M') == "01 01:00":
+            reset()
+        else:
+            pass
+        #영업일 구분
+        if (today.weekday() == 5) or (today.weekday() == 6) or (today.strftime('%d') in restday[today.strftime('%m')]):
+            if today.strftime('%H:%M') in list(set(workTime)|set(restTime)):
+                for i in range(10):
+                    newMail(driver)
+                    t.sleep(3)
+                t.sleep(3000)
             else:
                 pass
-            #영업일 구분
-            if (today.weekday() == 5) or (today.weekday() == 6) or (today.strftime('%d') in restday[today.strftime('%m')]):
-                if today.strftime('%H:%M') in list(set(workTime)|set(restTime)):
-                    for i in range(10):
-                        newMail(driver)
-                        t.sleep(3)
-                    t.sleep(3000)
-                else:
-                    pass
+        else:
+            if today.strftime('%H:%M') in workTime:
+                for i in range(10):
+                    emailClick(driver)
+                    t.sleep(3)
+                t.sleep(3000)
+            elif today.strftime('%H:%M') in restTime:
+                for i in range(10):
+                    newMail(driver)
+                    t.sleep(3)
+                t.sleep(3000)
             else:
-                if today.strftime('%H:%M') in workTime:
-                    for i in range(10):
-                        emailClick(driver)
-                        t.sleep(3)
-                    t.sleep(3000)
-                elif today.strftime('%H:%M') in restTime:
-                    for i in range(10):
-                        newMail(driver)
-                        t.sleep(3)
-                    t.sleep(3000)
-                else:
-                    pass
-            t.sleep(0.5)
-        except Exception:
-            driver.quit()
-            t.sleep(2)
-            os.execl(sys.executable, sys.executable, *sys.argv)
+                pass
+        t.sleep(0.5)
+    except Exception:
+        driver.quit()
+        t.sleep(2)
+        os.execl(sys.executable, sys.executable, *sys.argv)
 
 if __name__ == "__main__":
-    main()
+    while True:
+        main()
