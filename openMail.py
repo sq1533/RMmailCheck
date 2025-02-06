@@ -6,7 +6,7 @@ from datetime import datetime
 import requests
 import sys
 from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
+#from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
@@ -96,8 +96,8 @@ def getHome(page) -> None:
 
 #RM메일 확인
 def newMail(page) -> None:
-    page.refresh()
-    t.sleep(2)
+    ActionChains(page).click(page.find_element(By.XPATH,'//button[@class="btn_refresh refreshAtList"]')).perform()
+    t.sleep(1)
     mailHome_soup = BeautifulSoup(page.page_source,'html.parser')
     newMailCheck = mailHome_soup.find_all('li', attrs={'class':'notRead'})
     if newMailCheck:
@@ -130,8 +130,8 @@ def newMail(page) -> None:
 
 #영업일 메일 체크
 def emailClick(page) -> None:
-    page.refresh()
-    t.sleep(2)
+    ActionChains(page).click(page.find_element(By.XPATH,'//button[@class="btn_refresh refreshAtList"]')).perform()
+    t.sleep(1)
     mailHome_soup = BeautifulSoup(page.page_source,'html.parser')
     newMailCheck = mailHome_soup.find_all('li', attrs={'class':'notRead'})
     if newMailCheck:
@@ -145,11 +145,11 @@ def emailClick(page) -> None:
 workTime = ["08:00","10:00","12:00","14:00","16:00"]
 restTime = ["00:00","02:00","04:00","06:00","18:00","20:00","22:00"]
 #브라우저 호출
-options = Options()
-options.add_argument('--headless')
+options = webdriver.ChromeOptions()
+options.add_argument("--headless")
 options.add_argument('--disable-gpu')
 options.add_argument('--disable-extensions')
-driver = webdriver.Firefox(options=options)
+driver = webdriver.Chrome(options=options)
 driver.get("https://mail.worksmobile.com/")
 getHome(driver)
 
