@@ -1,15 +1,21 @@
 import os
+import sys
+import subprocess
 import json
 import pandas as pd
-import time as t
+import time
 from datetime import datetime
 import requests
-import sys
 from selenium import webdriver
-#from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
+
+#재시작 프로토콜
+def restart_script():
+    driver.quit()
+    subprocess.Popen([sys.executable] + sys.argv)
+    sys.exit()
 
 loginPath = os.path.join(os.path.dirname(__file__),"..","loginInfo.json")
 restDayPath = os.path.join(os.path.dirname(__file__),"..","restDay.json")
@@ -35,7 +41,7 @@ def reset() -> None:
     }
     pd.DataFrame(resets,index=[0]).to_json(rmMailPath,orient='records',force_ascii=False,indent=4)
     requests.get(f"https://api.telegram.org/bot{tele_bot['token']}/sendMessage?chat_id={tele_bot['chatId']}&text=초기화_완료")
-    t.sleep(61)
+    time.sleep(61)
 
 #RM한도 증액 가맹점 분류
 def read_mail(soup):
@@ -81,29 +87,29 @@ def read_mail(soup):
 
 #페이지 로드
 def getHome(page) -> None:
-    t.sleep(1)
+    time.sleep(1)
     id_box = page.find_element(By.XPATH,'//input[@id="user_id"]')
     login_button_1 = page.find_element(By.XPATH,'//button[@id="loginStart"]')
     id = works_login['id']
     ActionChains(page).send_keys_to_element(id_box, '{}'.format(id)).click(login_button_1).perform()
-    t.sleep(1)
+    time.sleep(1)
     password_box = page.find_element(By.XPATH,'//input[@id="user_pwd"]')
     login_button_2 = page.find_element(By.XPATH,'//button[@id="loginBtn"]')
     password = works_login['pw']
     ActionChains(page).send_keys_to_element(password_box, '{}'.format(password)).click(login_button_2).perform()
-    t.sleep(1)
+    time.sleep(1)
     page.get("https://mail.worksmobile.com/#/my/102")
 
 #RM메일 확인
 def newMail(page) -> None:
     ActionChains(page).click(page.find_element(By.XPATH,'//button[@class="btn_refresh refreshAtList"]')).perform()
-    t.sleep(1)
+    time.sleep(1)
     mailHome_soup = BeautifulSoup(page.page_source,'html.parser')
     newMailCheck = mailHome_soup.find_all('li', attrs={'class':'notRead'})
     if newMailCheck:
         newMail = page.find_element(By.XPATH,"//li[contains(@class,'notRead')]//div[@class='mTitle']//strong[@class='mail_title']")
         ActionChains(page).click(newMail).perform()
-        t.sleep(2)
+        time.sleep(2)
         mail_soup = BeautifulSoup(page.page_source,'html.parser')
         if read_mail(mail_soup).empty:
             tell = "{일}일 {시간}시 증액 필요 가맹점 없음".format(일=datetime.now().day,시간=datetime.now().hour)
@@ -131,7 +137,7 @@ def newMail(page) -> None:
 #영업일 메일 체크
 def emailClick(page) -> None:
     ActionChains(page).click(page.find_element(By.XPATH,'//button[@class="btn_refresh refreshAtList"]')).perform()
-    t.sleep(1)
+    time.sleep(1)
     mailHome_soup = BeautifulSoup(page.page_source,'html.parser')
     newMailCheck = mailHome_soup.find_all('li', attrs={'class':'notRead'})
     if newMailCheck:
@@ -166,29 +172,34 @@ def main():
             if today.strftime('%H:%M') in list(set(workTime)|set(restTime)):
                 for i in range(10):
                     newMail(driver)
-                    t.sleep(3)
-                t.sleep(3000)
+                    time.sleep(3)
+                time.sleep(3000)
             else:
                 pass
         else:
             if today.strftime('%H:%M') in workTime:
                 for i in range(10):
                     emailClick(driver)
-                    t.sleep(3)
-                t.sleep(3000)
+                    time.sleep(3)
+                time.sleep(3000)
             elif today.strftime('%H:%M') in restTime:
                 for i in range(10):
                     newMail(driver)
-                    t.sleep(3)
-                t.sleep(3000)
+                    time.sleep(3)
+                time.sleep(3000)
             else:
                 pass
-        t.sleep(0.5)
+        time.sleep(0.5)
     except Exception:
         driver.quit()
-        t.sleep(2)
-        os.execl(sys.executable, sys.executable, *sys.argv)
+        time.sleep(2)
+        restart_script()
 
 if __name__ == "__main__":
     while True:
-        main()
+        try:
+            main()
+            time.sleep(0.1)
+        except Exception as e:
+            print(e)
+            time.sleep(2)
